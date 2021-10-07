@@ -4,22 +4,14 @@ import { Button, Form, Field} from '../fomantic/Fomantic';
 
 export class Signup extends Component {
 
-  constructor(props) {
-    super(props)
-    
-    this.update = this.update.bind(this);
-
-  }
-
-  update() {
-    console.log(this.props.update);
-  }
-
   componentDidMount() {
 
+    // set reference to self so that jquery can use it later
+    var self = this;
+
     window.$.fn.form.settings.rules.validPassword = function(value) {
-      //return value.match(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d]{15,}$/) != null
-      return true;
+      return value.match(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d]{15,}$/) != null;
+      //return true;
     }
     window.$(".ui.form").form({
       fields: {
@@ -37,9 +29,19 @@ export class Signup extends Component {
       action: "register",
       serializeForm: true,
       method: "post",
-      onComplete: function(response) {
-        console.log(response);
-        return;
+      onSuccess: function(response) {
+        console.log(response);return;
+        window.localStorage.setItem("uuid",response.data[0].data.UUID)
+        window.$('#account-container').transition({
+          animation  : 'fade out',
+          duration   : '1s',
+          onComplete : function() {
+            self.props.update(true);
+          }
+        });
+      },
+      onFailure: function(response) {
+        window.$('.ui.form').form('add errors', [response.message]);
       }
       // beforeSubmit: function() {
       //   return false;
