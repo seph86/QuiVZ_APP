@@ -1,32 +1,46 @@
-import logo from './logo.svg';
-import './App.css';
+import { Component } from 'inferno';
+import { Login } from './components/Login'
+import { Signup } from './components/Signup'
+import './style.css';
+import logo from './images/Logo.png';
 
-import {Button} from 'semantic-ui-react';
 
-import 'fomantic-ui-css/semantic.css';
-import 'fomantic-ui-css/semantic.js';
+class App extends Component {
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <br />
-        <Button primary>Test</Button>
-      </header>
-    </div>
-  );
+  constructor(props){
+    super(props);
+    this.state = {
+      loggedIn:false,
+      UUID:window.localStorage.getItem("uuid")
+    }
+    this.updateLoggedIn = this.updateLoggedIn.bind(this);
+  }
+
+  updateLoggedIn(newState){
+    this.setState({loggedIn:newState})
+  }
+
+  render() {
+
+    if (this.state.loggedIn)
+      return (
+        <>
+          {<h1>hi</h1>}
+        </>
+      );
+    else
+      return (
+        <div id="account-container" class="ui grid middle aligned">
+          <div class="centered row">
+            <div class="ten wide center aligned column">
+              <img class="ui centered small image" src={logo} alt=""></img>
+              { this.state.UUID != null ?  <Login update={this.updateLoggedIn}/> : <Signup update={this.updateLoggedIn}/> }
+            </div>
+          </div>
+        </div>
+      );
+
+  }
 }
 
 export default App;
