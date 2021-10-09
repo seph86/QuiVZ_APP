@@ -30,25 +30,33 @@ export class Signup extends Component {
       serializeForm: true,
       method: "post",
       onSuccess: function(response) {
-        console.log(response);return;
-        window.localStorage.setItem("uuid",response.data[0].data.UUID)
+        window.localStorage.setItem("uuid",response[0].data.UUID);
+        window.localStorage.setItem("token", response[0].data.token);
         window.$('#account-container').transition({
           animation  : 'fade out',
           duration   : '1s',
           onComplete : function() {
             self.props.update(true);
+            window.localStorage.setItem("name","User");
           }
         });
       },
       onFailure: function(response) {
         window.$('.ui.form').form('add errors', [response.message]);
+      },
+      onError: function(error) {
+        window.$('.ui.form').form('add errors', [error]);
+      },
+      onAbort: function(error, element, xhr) {
+        if (xhr.statusText === "error")
+          window.$('.ui.form').form('add errors', ["There was an issue connecting to servers =("]);
       }
-      // beforeSubmit: function() {
-      //   return false;
-      // }
     });
-
-    console.log(this.props);
+    window.$(".ui.form").keypress(function(event) {
+      if (event.which ===  13) {
+        event.preventDefault();
+      }
+    })
   }
 
   render(){

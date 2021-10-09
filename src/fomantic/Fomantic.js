@@ -7,15 +7,8 @@ class Button extends Component {
   // }
 
   render() {
-
-    let classData = "ui button";
-
-    if (this.props.fluid) {
-      classData+=" fluid";
-    }
-
     return(
-      <button id={this.props.id} class={classData} onclick={this.props.onclick}>{this.props.children}</button>
+      <button id={this.props.id} class={"ui button " + (this.props.fluid ? "fluid" : "")} onclick={this.props.onclick}>{this.props.children}</button>
     );
   }
 }
@@ -24,7 +17,7 @@ class Form extends Component {
 
   render() {
     return (
-      <form class="ui form" >
+      <form id={this.props.id} class="ui form" >
         {this.props.children}
       </form>
     )

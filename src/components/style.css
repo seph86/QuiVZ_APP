@@ -1,1 +1,69 @@
 #login-pass { padding-bottom: 1rem; }
+#settings {width: 100vw; height: 100vh; display:block;margin-top: -100vh; transition: margin-top 0.5s;}
+#settings.open { margin-top: 0;}
+#dashboard-group {height: 97vh; overflow-y: scroll;margin-top: 3vh;}
+.ring-circle {
+  fill: none;
+  stroke: #A0D568;
+  stroke-linecap: round;
+  stroke-width: 4;
+  animation: ring-circle-animation 0.6s ease-out;
+}
+@keyframes ring-circle-animation {
+  0% {
+    stroke-dasharray: 0 100;
+  }
+}
+.ui.toggle.checkbox input:checked ~ label:before,
+.ui.toggle.checkbox input:focus:checked ~ label:before {
+  background-color: lime!important;
+}
+
+.ui.toggle.checkbox input ~ label:before,
+.ui.toggle.checkbox input:focus ~ label:before {
+  background-color: red!important;
+}
+
+.blue {
+  background-color: #4FC1E8!important;
+}
+.orange {
+  background-color: #f6925c!important;
+}
+.ItemContainer {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  z-index: 999;
+  display:none;
+}
+
+.ItemContainer > .menu {
+  display: none;
+  height: 100vh;
+}
+
+.transition.expand-menu {
+  animation-name: expand-background;
+}
+
+@keyframes expand-background {
+  0% {
+    width:0; left: 50%;
+    height: 20px; top: 50%;
+  }
+  50% {
+    left: 0px; width:100vw;
+    height: 20px; top: 50%;
+  }
+  100% {
+    left: 0; width:100vw;
+    top: 0; height: 100vh;
+  }
+}
+
+#search-results{ 
+  max-height: 40rem;
+}

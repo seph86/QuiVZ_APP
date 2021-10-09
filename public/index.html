@@ -20,7 +20,7 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <script src="jquery.js"></script>
-    <link rel="stylesheet" type="text/css" href="semantic.min.css">
+    <link id="stylesheet-theme" rel="stylesheet" type="text/css" href="semantic.min.css">
     <script src="semantic.min.js"></script>
     <title>Inferno App</title>
   </head>
@@ -39,5 +39,9 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+    <script>
+      if (window.localStorage.getItem("theme") === "light")
+        document.querySelector("#stylesheet-theme").href = "semantic-light.min.css";
+    </script>
   </body>
 </html>

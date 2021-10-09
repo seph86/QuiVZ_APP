@@ -139,7 +139,7 @@ body.pushable.dimmed {
   background: inherit;
 }
 body.pushable > .pusher {
-  background: linear-gradient(167deg, #25252A, #4C4C51);
+  background: #F9FAFB;
 }
 
 /*--------------

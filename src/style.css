@@ -1,6 +1,8 @@
 #root {
   height: 100vh;
+  overflow: hidden;
 }
+#root .grid { overflow-x: hidden; }
 
 #account-container {
   height: 80%;

@@ -1,31 +1,68 @@
 import { Component } from 'inferno';
 import './style.css';
-import { Button } from '../fomantic/Fomantic';
+import { Button, Form, Field } from '../fomantic/Fomantic';
 
 export class Login extends Component {
 
   componentDidMount() {
-    window.$("#login-button").api({
+
+    var self = this;
+    window.$(".ui.form").form({
+      fields: {
+        password: ["empty"]
+      }
+    }).api({
       action: "login",
-      method: "post",
+      method: "POST",
+      data: {
+        uuid: window.localStorage.getItem("uuid")
+      },
+      onSuccess: function(response) {
+        window.localStorage.setItem("token", response[0].data.token);
+        console.log(response);
+        window.$('#account-container').transition({
+          animation  : 'fade out',
+          duration   : '1s',
+          onComplete : function() {
+            self.props.update(true);
+          }
+        });
+      },
+      onFailure: function(response) {
+        window.$('.ui.form').form('add errors', [response.message]);
+      },
+      onError: function(error) {
+        window.$('.ui.form').form('add errors', [error]);
+      },
+      onAbort: function(error, element, xhr) {
+        if (xhr.statusText === "error")
+          window.$('.ui.form').form('add errors', ["There was an issue connecting to servers =("]);
+      },
       beforeSend: function(settings) {
-        settings.data.uuid = "65a6fc4a8551e48fd5a9fcafe9cfb5a35df0782551d870951ec6457e7dee0924";
-        settings.data.password = "StrongPassword01";
+        settings.data.password = window.$(".ui.form input").val()
         return settings;
       }
     });
+
+    window.$(".ui.form").keypress(function(event) {
+      if (event.which ===  13) {
+        event.preventDefault();
+      }
+    })
+
   }
 
   render(){
     return(
-      <>
-        <div id="login-pass" class="ui input fluid">
-          <input placeholder="password" type="password"></input>
-        </div>
-        <div>
-          <Button id="login-button" fluid>Login</Button>
-        </div>
-      </>
+      <Form>
+        <Field>
+          <div class="ui input">
+            <input placeholder="Password" type="password" name="password" autoComplete="new-password" />
+          </div>
+        </Field>
+        <div class="ui error message"></div>
+        <Button id="login-button" fluid>Login</Button>
+      </Form>
     );
   }
 

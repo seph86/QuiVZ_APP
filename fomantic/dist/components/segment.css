@@ -689,7 +689,7 @@
 
 /* Nested */
 .ui.inverted.segment .segment {
-  color: #FFFFFF;
+  color: #25252A;
 }
 .ui.inverted.segment .inverted.segment {
   color: rgba(255, 255, 255, 0.9);
@@ -835,6 +835,9 @@
          Theme Overrides
 *******************************/
 
+.segment {
+  overflow-x: hidden;
+}
 
 
 /*******************************
