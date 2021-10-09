@@ -19,7 +19,6 @@ export class Login extends Component {
       },
       onSuccess: function(response) {
         window.localStorage.setItem("token", response[0].data.token);
-        console.log(response);
         window.$('#account-container').transition({
           animation  : 'fade out',
           duration   : '1s',

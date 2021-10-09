@@ -1,18 +1,16 @@
 {
-  "name": "app",
+  "name": "app2",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "fomantic-ui": "^2.8.8",
+    "cra-append-sw": "^2.7.0",
     "inferno": "^7.4.10",
-    "inferno-animation": "^7.5.1",
     "inferno-extras": "^7.4.10",
-    "inferno-router": "^7.4.10",
     "inferno-scripts": "7.0.4"
   },
   "scripts": {
     "start": "inferno-scripts start",
-    "build": "inferno-scripts build",
+    "build": "inferno-scripts build && cra-append-sw ./custom-sw.js",
     "test": "inferno-scripts test",
     "eject": "inferno-scripts eject"
   },

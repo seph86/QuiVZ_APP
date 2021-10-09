@@ -255,11 +255,11 @@ class Settings extends Component {
                 <label>
                   Change Password
                 </label>
-                <input name="oldpassword" placeholder="old password" type="password"></input>
+                <input name="oldpassword" placeholder="old password" type="password" autoComplete="new-password"></input>
                 <label></label>
-                <input name="newpassword" placeholder="new password" type="password"></input>
+                <input name="newpassword" placeholder="new password" type="password" autoComplete="new-password"></input>
                 <label></label>
-                <input data-validate="confirm_password" placeholder="confirm password" type="password"></input>
+                <input data-validate="confirm_password" placeholder="confirm password" type="password" autoComplete="new-password"></input>
               </Field>
               <div class="ui error message"></div>
               <Button fluid>Submit</Button>
