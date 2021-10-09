@@ -1,0 +1,7 @@
+/*******************************
+        Global Overrides
+*******************************/
+
+body {
+    background-attachment: fixed;
+}
