@@ -6,7 +6,7 @@ export class Login extends Component {
 
   componentDidMount() {
 
-    var self = this;
+    const self = this;
     window.$(".ui.form").form({
       fields: {
         password: ["empty"]

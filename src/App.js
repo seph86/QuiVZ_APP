@@ -26,7 +26,7 @@ class App extends Component {
     // No need to do anything if there is no token
     if (!this.state.loggedIn) return;
 
-    var self = this;
+    const self = this;
     // check we are logged in
     window.$("body").api({
       action: "is logged in",

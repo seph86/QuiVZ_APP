@@ -198,7 +198,7 @@ class Settings extends Component {
 
   confirmLogout(){
 
-    var self = this;
+    const self = this;
     var token = window.localStorage.getItem("token");
     window.$(".ui.basic.modal").modal({
       onApprove: function() {

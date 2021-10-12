@@ -13,6 +13,8 @@ window.$.fn.api.settings.api = {
   "new password" : "http://localhost:8080/user/newpassword/"
 }
 
+window.$.fn.form.settings.keyboardShortcuts = false;
+
 {
   let store = window.localStorage;
   if (store.getItem("uuid") === null) store.setItem("uuid", "");

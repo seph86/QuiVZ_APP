@@ -11,7 +11,7 @@
   "scripts": {
     "build-sw":"node ./scripts/build-sw.js",
     "start": "inferno-scripts start",
-    "build": "inferno-scripts build",
+    "build": "inferno-scripts build && cat src/custom-service-worker.js >> build/service-worker.js",
     "test": "inferno-scripts test",
     "eject": "inferno-scripts eject"
   },

@@ -1,9 +1,9 @@
 {
-  "short_name": "Inferno App",
-  "name": "Create Inferno App Sample",
+  "short_name": "QuiVS",
+  "name": "QuiVS app",
   "icons": [
     {
-      "src": "logo.png",
+      "src": "Logo.png",
       "sizes": "1024x1024",
       "type": "image/png"
     }

@@ -7,7 +7,7 @@ export class Signup extends Component {
   componentDidMount() {
 
     // set reference to self so that jquery can use it later
-    var self = this;
+    const self = this;
 
     window.$.fn.form.settings.rules.validPassword = function(value) {
       return value.match(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d]{15,}$/) != null;
@@ -21,7 +21,13 @@ export class Signup extends Component {
               type: 'validPassword',
               prompt: "Password must be 15 characters containg at least 1 uppercase, 1 lowercase, and 1 digit"
             }
-          ]
+          ],
+          onValid: function(field) {
+            console.log("valid?");
+          },
+          onInvalid: function(field) {
+            console.log("invalid?");
+          }
         },
         password_confirm: ["match[password]", "empty"]
       }
@@ -52,24 +58,21 @@ export class Signup extends Component {
           window.$('.ui.form').form('add errors', ["There was an issue connecting to servers =("]);
       }
     });
-    window.$(".ui.form").keypress(function(event) {
-      if (event.which ===  13) {
-        event.preventDefault();
-      }
-    })
   }
 
   render(){
     return(
       <Form>
         <Field>
-          <div class="ui input">
+          <div class="ui icon input">
             <input placeholder="Password" type="password" name="password" autoComplete="new-password" />
+            <i class="key icon"></i>
           </div>
         </Field>
         <Field>
-          <div class="ui input">
+          <div class="ui icon input">
             <input placeholder="Confirm Password" type="password" name="password_confirm" autoComplete="new-password" />
+            <i class="key icon"></i>
           </div>
         </Field>
         <div class="ui error message"></div>
