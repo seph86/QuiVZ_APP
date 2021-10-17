@@ -21,30 +21,6 @@ class App extends Component {
     if (!newState) window.localStorage.setItem("token", "");
   }
 
-  componentWillMount() {
-
-    // No need to do anything if there is no token
-    if (!this.state.loggedIn) return;
-
-    const self = this;
-    // check we are logged in
-    window.$("body").api({
-      action: "is logged in",
-      on: "now",
-      method: "post",
-      data: {
-        token: window.localStorage.getItem("token")
-      },
-      onSuccess: function() {
-        self.setState({loggedIn: true});
-      },
-      onFailure: function() {
-        self.setState({loggedIn: false});
-        window.localStorage.setItem("token", "");
-      }
-    })
-  }
-
   render() {
     if (this.state.loggedIn)
       return (

@@ -1,5 +1,5 @@
 #login-pass { padding-bottom: 1rem; }
-#settings {width: 100vw; height: 100vh; display:block;margin-top: -100vh; transition: margin-top 0.5s;}
+#settings {height: 100vh; display:block;margin-top: -100vh; transition: margin-top 0.5s;}
 #settings.open { margin-top: 0;}
 #dashboard-group {height: 97vh; overflow-y: scroll;margin-top: 3vh;}
 .ring-circle {

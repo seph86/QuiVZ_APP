@@ -2,15 +2,17 @@ import { render } from 'inferno';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
+const api_loc = "http://" + window.location.hostname + ":8080";
+
 window.$.fn.api.settings.api = {
-  "teapot":"http://localhost:8080/teapot/",
-  "login":"http://localhost:8080/user/login/",
-  "is logged in": "http://localhost:8080/user/loggedin/",
-  "logout": "http://localhost:8080/user/logout/",
-  "register" : "http://localhost:8080/user/register/",
-  "search category" : "http://localhost:8080/category/search/",
-  "all categories" : "http://localhost:8080/category/getall/",
-  "new password" : "http://localhost:8080/user/newpassword/"
+  "teapot": api_loc + "/teapot/",
+  "login": api_loc + "/user/login/",
+  "is logged in": api_loc + "/user/loggedin/",
+  "logout": api_loc + "/user/logout/",
+  "register" : api_loc + "/user/register/",
+  "search category" : api_loc + "/category/search/",
+  "all categories" : api_loc + "/category/getall/",
+  "new password" : api_loc + "/user/newpassword/"
 }
 
 window.$.fn.form.settings.keyboardShortcuts = false;

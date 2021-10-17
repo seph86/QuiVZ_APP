@@ -4,7 +4,7 @@ import { Challenge } from './Challenge';
 import { Test } from './Test';
 import { SearchCategories } from './SearchCategories';
 import { AllCategories } from './AllCategories';
-import { Form, Field, Button } from '../fomantic/Fomantic';
+import { Form, Field, Button, Nag } from '../fomantic/Fomantic';
 import './style.css';
 
 export class Dashboard extends Component {
@@ -38,6 +38,7 @@ export class Dashboard extends Component {
       <div class="ui container">
         <Settings username={this.state.username} updateUsername={this.updateUsername} onLogout={this.props.setLoggedIn}/>
         <div id="dashboard-group">
+          <Nag id="nointernet" color="red">No internet connection</Nag>
           <DashboardHeader username={this.state.username}/>
           <div class="ui segment inverted grey">
             <h2>Wins</h2>
@@ -45,7 +46,6 @@ export class Dashboard extends Component {
           </div>
           <Challenge />
           <SearchCategories />
-          {/* <ShowAllCategories /> */}
           <Test />
           <AllCategories />
         </div>

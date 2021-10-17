@@ -42,8 +42,8 @@ export class Signup extends Component {
           animation  : 'fade out',
           duration   : '1s',
           onComplete : function() {
-            self.props.update(true);
             window.localStorage.setItem("name","User");
+            self.props.update(true);
           }
         });
       },

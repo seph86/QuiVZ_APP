@@ -1,6 +1,6 @@
 import { Component } from 'inferno'
 
-class Button extends Component {
+export class Button extends Component {
 
   // constructor(props) {
   //   super(props);
@@ -13,7 +13,7 @@ class Button extends Component {
   }
 }
 
-class Form extends Component {
+export class Form extends Component {
 
   render() {
     return (
@@ -25,7 +25,7 @@ class Form extends Component {
   
 }
 
-class Field extends Component {
+export class Field extends Component {
   render() {
     return (
       <div class="field">
@@ -35,4 +35,12 @@ class Field extends Component {
   }
 }
 
-export { Button, Form, Field }
+export class Nag extends Component {
+  render() {
+    return ( 
+      <div id={this.props.id} class={"ui " + this.props.color + " nag"} style={{display: "none!important"}}><div class="title">{this.props.children}</div></div>
+    )
+  }
+}
+
+//export { Button, Form, Field }
