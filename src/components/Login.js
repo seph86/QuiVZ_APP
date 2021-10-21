@@ -19,6 +19,7 @@ export class Login extends Component {
       },
       onSuccess: function(response) {
         window.localStorage.setItem("token", response.data.token);
+        window.localStorage.setItem("conditional", response.data.conditional);
         window.$('#account-container').transition({
           animation  : 'fade out',
           duration   : '1s',

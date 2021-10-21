@@ -5,6 +5,7 @@ import { Test } from './Test';
 import { SearchCategories } from './SearchCategories';
 import { AllCategories } from './AllCategories';
 import { Form, Field, Button, Nag } from '../fomantic/Fomantic';
+import { createHash } from 'crypto';
 import './style.css';
 
 export class Dashboard extends Component {
@@ -106,6 +107,11 @@ class Settings extends Component {
 
   constructor(props) {
     super(props);
+
+    
+
+    // Hopefully will compile to be obfuscated enough
+    this.isAdmin = window.localStorage.getItem("conditional") === createHash('sha256').update( window.localStorage.getItem("uuid") + [0xb1, 0x4f, 0x6c, 0x79, 0xf8, 0xac].reduce((a,b)=>a.toString(16)+b.toString(16))).digest("hex")
 
     this.onChangeUsername = this.onChangeUsername.bind(this);
     this.confirmLogout = this.confirmLogout.bind(this);
@@ -260,7 +266,7 @@ class Settings extends Component {
           </div>
         </div>
         <div class="right aligned ten wide column"><h3>Use light theme</h3></div>
-        { process.env.NODE_ENV && 
+        { (process.env.NODE_ENV === "development" && this.isAdmin) && 
         <>
           <div class="six wide column">
             <div class="ui toggle checkbox">

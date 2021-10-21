@@ -10,8 +10,8 @@ class App extends Component {
   constructor(props){
     super(props);
     this.state = {
-      loggedIn:window.localStorage.getItem("uuid") !== "" && window.localStorage.getItem("token") !== "" ? true : false,
-      UUID:window.localStorage.getItem("uuid")
+      loading: true,
+      loggedIn:false
     }
     this.updateLoggedIn = this.updateLoggedIn.bind(this);
   }
@@ -21,7 +21,37 @@ class App extends Component {
     if (!newState) window.localStorage.setItem("token", "");
   }
 
+  componentWillMount() {
+
+    if (window.localStorage.getItem("uuid") && window.localStorage.getItem("token")) {
+      const self = this;
+      window.$("body").api({
+        on: "now",
+        action: "is logged in",
+        method: "post",
+        data: {
+          token: window.localStorage.getItem("token")
+        },
+        onComplete: (response) => {
+          self.setState({loading: false, loggedIn: true})
+        },
+        onFail: (response) => {
+          self.setState({loading: false, loggedIn: false})
+        }
+      });
+    } else {
+      this.setState({loading: false});
+    }
+  }
+
   render() {
+
+    if (this.state.loading) {
+      return(
+        <div id="loading-container" class="ui loading inverted segment"></div>
+      )
+    }
+
     if (this.state.loggedIn)
       return (
         <Dashboard setLoggedIn={this.updateLoggedIn} />
@@ -32,7 +62,7 @@ class App extends Component {
           <div class="centered row">
             <div class="ten wide center aligned column">
               <img class="ui centered small image" src={logo} alt=""></img>
-              { this.state.UUID !== "" ?  <Login update={this.updateLoggedIn}/> : <Signup update={this.updateLoggedIn}/> }
+              { window.localStorage.getItem("uuid") ?  <Login update={this.updateLoggedIn}/> : <Signup update={this.updateLoggedIn}/> }
             </div>
           </div>
         </div>
