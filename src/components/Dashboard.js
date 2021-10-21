@@ -13,10 +13,12 @@ export class Dashboard extends Component {
     super(props);
 
     this.state = {
-      username: window.localStorage.getItem("name")
+      username: window.localStorage.getItem("name"),
+      isAdmin: false
     };
 
     this.updateUsername = this.updateUsername.bind(this);
+    this.updateAdmin = this.updateAdmin.bind(this);
   }
 
   updateUsername(username) {
@@ -24,19 +26,23 @@ export class Dashboard extends Component {
     window.localStorage.setItem("name", username);
   }
 
+  updateAdmin(newState) {
+    this.setState({isAdmin: newState});
+  }
+
   componentDidMount(){
     window.$('#dashboard-group .segment')
     .transition({
       animation : 'pulse',
       reverse   : 'auto', // default setting
-      interval  : 200
+      interval  : 100
     });
   }
 
   render() {
     return(
       <div class="ui container">
-        <Settings username={this.state.username} updateUsername={this.updateUsername} onLogout={this.props.setLoggedIn}/>
+        <Settings username={this.state.username} updateUsername={this.updateUsername} updateAdmin={this.updateAdmin} onLogout={this.props.setLoggedIn}/>
         <div id="dashboard-group">
           <Nag id="nointernet" color="red">No internet connection</Nag>
           <DashboardHeader username={this.state.username}/>
@@ -46,8 +52,11 @@ export class Dashboard extends Component {
           </div>
           <Challenge />
           <SearchCategories />
-          <Test />
           <AllCategories />
+          { this.state.isAdmin && <>
+            <h2>Admin options</h2>
+            <Test />
+          </> }
         </div>
 
       </div>
@@ -100,10 +109,10 @@ class Settings extends Component {
 
     this.onChangeUsername = this.onChangeUsername.bind(this);
     this.confirmLogout = this.confirmLogout.bind(this);
+    this.onChangeAdmin = this.onChangeAdmin.bind(this);
   }
 
   onChangeUsername(event) {
-
     window.$(findDOMNode(this)).find("#change-name").form("validate form");
     if (window.$(findDOMNode(this)).find("#change-name").form("is valid")) {
       this.props.updateUsername(event.target.value);
@@ -113,11 +122,14 @@ class Settings extends Component {
         class: "success"
       })
     }
-
   }
 
   onClickX() {
     window.$("#settings").removeClass("open");
+  }
+
+  onChangeAdmin() {
+    this.props.updateAdmin( window.$("#admin-mode").prop("checked") )
   }
 
   componentDidMount() {
@@ -248,6 +260,17 @@ class Settings extends Component {
           </div>
         </div>
         <div class="right aligned ten wide column"><h3>Use light theme</h3></div>
+        { process.env.NODE_ENV && 
+        <>
+          <div class="six wide column">
+            <div class="ui toggle checkbox">
+              <input id="admin-mode" type="checkbox" name="public" onClick={this.onChangeAdmin}/>
+              <label></label>
+            </div>
+          </div>
+          <div class="right aligned ten wide column"><h3>DEVELOPER: Enable Admin Mode</h3></div>
+        </>
+        }
         <div class="row">
           <div class="sixteen wide column">
             <Form id="update-password">

@@ -31,7 +31,7 @@ export class AllCategories extends Component {
       },
       on: "now",
       onSuccess: function(response) {
-        self.setState({results: response[0].data})
+        self.setState({results: response.data})
       },
       beforeSend: function(settings) {
         settings.data.token = window.localStorage.getItem("token");

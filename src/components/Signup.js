@@ -36,8 +36,8 @@ export class Signup extends Component {
       serializeForm: true,
       method: "post",
       onSuccess: function(response) {
-        window.localStorage.setItem("uuid",response[0].data.UUID);
-        window.localStorage.setItem("token", response[0].data.token);
+        window.localStorage.setItem("uuid",response.data.UUID);
+        window.localStorage.setItem("token", response.data.token);
         window.$('#account-container').transition({
           animation  : 'fade out',
           duration   : '1s',

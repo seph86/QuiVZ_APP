@@ -25,10 +25,14 @@ export class SearchCategories extends Component {
     window.$(findDOMNode(this)).next().transition("fade out", 500, () => {self.setState({isOpen: false});})
   }
 
+  onClickReport(param) {
+    console.log(param);
+  }
+
   componentDidUpdate() {
     if (this.state.isOpen) {
       let self = this;
-      window.$(findDOMNode(this)).nextAll(".ItemContainer").find(".button").api({
+      window.$("#category-search").api({
         action: "search category",
         method: "post",
         data: {
@@ -47,8 +51,8 @@ export class SearchCategories extends Component {
           return settings;
         },
         onSuccess: function(response) {
-          if (response[0] !== undefined) {
-            self.setState({results: response[0].data})
+          if (response !== undefined) {
+            self.setState({results: response.data})
           }
         }
       })
@@ -88,7 +92,7 @@ export class SearchCategories extends Component {
                 <div class="column">
                   <div class="ui fluid action input">
                     <input type="text" placeholder="Search...(try 'test')" />
-                    <button class="ui button">Search</button>
+                    <button id="category-search" class="ui button">Search</button>
                   </div>
                 </div>
               </div>
@@ -98,6 +102,9 @@ export class SearchCategories extends Component {
                 <div class="ui relaxed divided list">
                   {this.state.results.map(data => (
                     <div class="item">
+                      <div class="right floated content">
+                        <div class="ui button report" onClick={() => this.onClickReport(2)}>Report</div>
+                      </div>
                       <div class="content">{data}</div>
                     </div>
                   ))}
