@@ -35,9 +35,6 @@ export class SearchCategories extends Component {
       window.$("#category-search").api({
         action: "search category",
         method: "post",
-        data: {
-          token: window.localStorage.getItem("token")
-        },
         beforeSend: function(settings) {
           if (window.$(".ItemContainer.blue input").val() === "") {
             window.$("body").toast({
@@ -102,9 +99,9 @@ export class SearchCategories extends Component {
                 <div class="ui relaxed divided list">
                   {this.state.results.map(data => (
                     <div class="item">
-                      <div class="right floated content">
+                      {/* <div class="right floated content">
                         <div class="ui button report" onClick={() => this.onClickReport(2)}>Report</div>
-                      </div>
+                      </div> */}
                       <div class="content">{data}</div>
                     </div>
                   ))}

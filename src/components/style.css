@@ -24,12 +24,19 @@
   background-color: red!important;
 }
 
-.blue {
-  background-color: #4FC1E8!important;
-}
-.orange {
-  background-color: #f6925c!important;
-}
+.red { background-color: #ED5564;}
+.orange { background-color: #F6925C;}
+.yellow { background-color: #FFCE54;}
+.olive { background-color: #D0D25E;}
+.green { background-color: #A0D568;}
+.teal { background-color: #78CBA8;}
+.blue { background-color: #4FC1E8;}
+.violet { background-color: #7EAAEA;}
+.purple { background-color: #AC92EB;}
+.pink { background-color: #CD74A8;}
+.brown { background-color: #AE4309;}
+.grey { background-color: #4C4C51;}
+.black { background-color: #25252A;}
 .ItemContainer {
   width: 100vw;
   height: 100vh;
