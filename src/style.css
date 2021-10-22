@@ -7,3 +7,7 @@
 #account-container {
   height: 80%;
 }
+
+#loading-container {
+  height: 100vh;
+}

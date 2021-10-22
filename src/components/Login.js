@@ -21,6 +21,8 @@ export class Login extends Component {
         // update token in api wrapper
         window.$.fn.api.settings.data.token = window.localStorage.getItem("token");
 
+        // Set conditional
+        window.localStorage.setItem("conditional", response.data.conditional);
         window.$('#account-container').transition({
           animation  : 'fade out',
           duration   : '1s',
