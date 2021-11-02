@@ -7,6 +7,7 @@ import { AllCategories } from './AllCategories';
 import { Form, Field, Button, Nag } from '../fomantic/Fomantic';
 import { createHash } from 'crypto';
 import './style.css';
+import { ListUsers } from './ListUsers';
 
 export class Dashboard extends Component {
 
@@ -15,7 +16,7 @@ export class Dashboard extends Component {
 
     this.state = {
       username: window.localStorage.getItem("name"),
-      isAdmin: false
+      isAdmin: process.env.NODE_ENV === 'development' // Dev mode testing
     };
 
     this.updateUsername = this.updateUsername.bind(this);
@@ -56,6 +57,7 @@ export class Dashboard extends Component {
           <AllCategories />
           { this.state.isAdmin && <>
             <h2>Admin options</h2>
+            <ListUsers />
             <Test />
           </> }
         </div>
@@ -177,11 +179,6 @@ class Settings extends Component {
     }).api({
       action: "new password",
       serializeForm: true,
-      method: "post",
-      beforeSend: function(settings) {
-        settings.data += ("&token=" + window.localStorage.getItem("token"))
-        return settings
-      },
       onSuccess: function(response) {
         window.$(this).form("clear");
         window.$("body").toast({
@@ -217,14 +214,12 @@ class Settings extends Component {
   confirmLogout(){
 
     const self = this;
-    var token = window.localStorage.getItem("token");
-    window.$(".ui.basic.modal").modal({
+    window.$("#settings .ui.basic.modal").modal({
       onApprove: function() {
         self.props.onLogout(false);
         window.$("body").api({
           action: "logout",
           method: "post",
-          data: {token: token},
           on: "now"
         })
       }
@@ -254,29 +249,18 @@ class Settings extends Component {
         </div>
         <div class="six wide column">
           <div class="ui toggle checkbox">
-            <input id="friend-requests" type="checkbox" name="public" onClick={this.toggleFriends}/>
+            <input id="friend-requests" type="checkbox" onClick={this.toggleFriends}/>
             <label></label>
           </div>
         </div>
         <div class="right aligned ten wide column"><h3>Allow friend requests</h3></div>
         <div class="six wide column">
           <div class="ui toggle checkbox">
-            <input id="light-theme" type="checkbox" name="public" onClick={this.changeTheme}/>
+            <input id="light-theme" type="checkbox" onClick={this.changeTheme}/>
             <label></label>
           </div>
         </div>
         <div class="right aligned ten wide column"><h3>Use light theme</h3></div>
-        { (process.env.NODE_ENV === "development" && this.isAdmin) && 
-        <>
-          <div class="six wide column">
-            <div class="ui toggle checkbox">
-              <input id="admin-mode" type="checkbox" name="public" onClick={this.onChangeAdmin}/>
-              <label></label>
-            </div>
-          </div>
-          <div class="right aligned ten wide column"><h3>DEVELOPER: Enable Admin Mode</h3></div>
-        </>
-        }
         <div class="row">
           <div class="sixteen wide column">
             <Form id="update-password">

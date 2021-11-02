@@ -5,7 +5,7 @@ import { Dashboard } from './components/Dashboard';
 import './style.css';
 import logo from './images/Logo.png';
 
-class App extends Component {
+export class App extends Component {
 
   constructor(props){
     super(props);
@@ -14,6 +14,7 @@ class App extends Component {
       loggedIn:false
     }
     this.updateLoggedIn = this.updateLoggedIn.bind(this);
+    pointer = this.updateLoggedIn;
   }
 
   updateLoggedIn(newState){
@@ -71,4 +72,5 @@ class App extends Component {
   }
 }
 
-export default App;
+// Reference to the function call in App
+export var pointer;

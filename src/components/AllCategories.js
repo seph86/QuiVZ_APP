@@ -23,19 +23,12 @@ export class AllCategories extends Component {
     window.$(findDOMNode(this)).nextAll(".ItemContainer").find(".segment:first").api({
       action: "all categories",
       method: "post",
-      data: {
-        token: window.localStorage.getItem("token")
-      },
       className: {
         loading: "inverted loading"
       },
       on: "now",
       onSuccess: function(response) {
         self.setState({results: response.data})
-      },
-      beforeSend: function(settings) {
-        settings.data.token = window.localStorage.getItem("token");
-        return settings;
       }
     })
   }

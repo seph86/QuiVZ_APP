@@ -38,6 +38,10 @@ export class Signup extends Component {
       onSuccess: function(response) {
         window.localStorage.setItem("uuid",response.data.UUID);
         window.localStorage.setItem("token", response.data.token);
+
+        // update token in api wrapper
+        window.$.fn.api.settings.data.token = window.localStorage.getItem("token");
+        
         window.$('#account-container').transition({
           animation  : 'fade out',
           duration   : '1s',

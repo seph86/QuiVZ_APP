@@ -13,12 +13,15 @@ export class Login extends Component {
       }
     }).api({
       action: "login",
-      method: "POST",
-      data: {
-        uuid: window.localStorage.getItem("uuid")
-      },
+      serializeForm: true,
       onSuccess: function(response) {
+        // update token in localstorage
         window.localStorage.setItem("token", response.data.token);
+
+        // update token in api wrapper
+        window.$.fn.api.settings.data.token = window.localStorage.getItem("token");
+
+        // Set conditional
         window.localStorage.setItem("conditional", response.data.conditional);
         window.$('#account-container').transition({
           animation  : 'fade out',
@@ -37,10 +40,6 @@ export class Login extends Component {
       onAbort: function(error, element, xhr) {
         if (xhr.statusText === "error")
           window.$('.ui.form').form('add errors', ["There was an issue connecting to servers =("]);
-      },
-      beforeSend: function(settings) {
-        settings.data.password = window.$(".ui.form input").val()
-        return settings;
       }
     });
 
@@ -55,6 +54,11 @@ export class Login extends Component {
   render(){
     return(
       <Form>
+        <Field>
+          <div class="ui input">
+            <input  name="uuid" autoComplete="new-password" value={window.localStorage.getItem("uuid")} hidden/>
+          </div>
+        </Field>
         <Field>
           <div class="ui input">
             <input placeholder="Password" type="password" name="password" autoComplete="new-password" />
