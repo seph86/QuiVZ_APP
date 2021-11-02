@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "chart.js": "^3.6.0",
+    "chartjs-plugin-datalabels": "^2.0.0",
     "cra-append-sw": "^2.7.0",
     "http-server": "^13.0.2",
     "inferno": "^7.4.10",

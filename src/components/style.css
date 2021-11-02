@@ -67,3 +67,42 @@
 #search-results{ 
   max-height: 40rem;
 }
+
+#quiz-container{
+  height: 100vh;
+  margin-top: 0;
+  position: relative;
+}
+#quiz-container .column:first-child,
+#quiz-container .column:last-child {
+  margin:0;padding:0;
+}
+#quiz-container .column:nth-child(2){
+  padding: 0 1rem;
+}
+
+.totalscore {
+  width: calc(100% - 2em);
+  position: absolute;
+  top: 0;
+  left: 1em;
+  height: 20vh;
+}
+
+.scorebar {
+  position:absolute;
+}
+.scorebar > .progress{
+  max-width: 100vh!important;
+  width: 100vh!important;
+}
+#player-score.scorebar {
+  transform: rotate(90deg);
+  transform-origin: top left;
+  left: 1em;
+}
+#opponent-score.scorebar {
+  transform: rotate(270deg);
+  transform-origin: top right;
+  right: 1em;
+}
