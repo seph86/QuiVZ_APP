@@ -9,7 +9,8 @@
     "http-server": "^13.0.2",
     "inferno": "^7.4.10",
     "inferno-extras": "^7.4.10",
-    "inferno-scripts": "7.0.4"
+    "inferno-scripts": "7.0.4",
+    "textfit": "^2.4.0"
   },
   "scripts": {
     "start": "inferno-scripts start",

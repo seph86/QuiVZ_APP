@@ -1,5 +1,5 @@
 import { render } from 'inferno';
-import App from './App';
+import { App, pointer } from './App';
 import { Quiz } from './components/Quiz';
 import * as serviceWorker from './serviceWorker';
 
@@ -16,7 +16,8 @@ window.$.fn.api.settings.api = {
   "all categories" : api_loc + "/category/getall/",
   "new password" : api_loc + "/user/newpassword/",
   "all users" : api_loc + "/admin/users/list/",
-  "make admin" : api_loc + "/admin/users/makeadmin/{uuid}"
+  "make admin" : api_loc + "/admin/users/makeadmin/{uuid}",
+  "solo play": api_loc + "/quiz/start_solo/"
 }
 
 // set default method to post
