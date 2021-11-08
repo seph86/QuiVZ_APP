@@ -11,7 +11,18 @@ export class Quiz extends Component {
     this.state = {
       playerscore: 1000,
       opponescore: 1000,
-      questions: [],
+      questions: [
+        {
+          question: "question 1",
+          incorrect_answers: ["1","2","3"],
+          correct_answer: "0"
+        },
+        {
+          question: "question 2",
+          incorrect_answers: ["8","7","6"],
+          correct_answer: "9"
+        }
+      ],
       questionNumber: 0,
       question: "",
       answers: [],
@@ -20,6 +31,7 @@ export class Quiz extends Component {
     }
     
     this.onAnswer = this.onAnswer.bind(this);
+    this.populateAnswers = this.populateAnswers.bind(this);
   }
 
   populateAnswers() {
@@ -29,8 +41,7 @@ export class Quiz extends Component {
     let currentQuestion = this.state.questions[this.state.questionNumber]
     let answers = currentQuestion.incorrect_answers;
     answers.splice(index, 0, currentQuestion.correct_answer);
-    this.setState({answers: answers, correct: index});
-    this.setState({question: currentQuestion.question});
+    this.setState({answers: answers, correct: index, question: currentQuestion.question});
   }
 
   onAnswer(event) {
@@ -51,7 +62,7 @@ export class Quiz extends Component {
       self.setState({questionNumber: self.state.questionNumber+1, clickable: true});
       self.populateAnswers();
       window.$(".ui .button").removeClass("red green");
-    }, 2000, this);
+    }, 200, this);
 
   }
 
@@ -141,14 +152,15 @@ export class Quiz extends Component {
     //   }
     // }, 100)
 
-    window.$("body").api({
-      on: "now",
-      action: "solo play",
-      onSuccess: function(result) {
-        self.setState({questions: result.data})
-        self.populateAnswers();
-      }
-    })
+    // window.$("body").api({
+    //   on: "now",
+    //   action: "solo play",
+    //   onSuccess: function(result) {
+    //     self.setState({questions: result.data})
+    //     self.populateAnswers();
+    //   }
+    // })
+    this.populateAnswers();
   }
 
   shouldComponentUpdate(nextprops, nextstate) {
@@ -159,8 +171,9 @@ export class Quiz extends Component {
       return true;
   }
 
-  componentDidUpdate() {
-    textFit(document.querySelector("#question"), {minFontSize: 10, alignVert: true, alignHoriz: true, maxFontSize: 20})
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.question !== this.state.question)
+      textFit(document.querySelector("#question"), {minFontSize: 10, alignVert: true, alignHoriz: true, maxFontSize: 20, reProcess: true})
   }
 
   //TODO: Remove this is a test function
@@ -173,23 +186,25 @@ export class Quiz extends Component {
   render() {
     return (
       <div id="quiz-container" class="ui fluid container">
-        <ScoreBar id="player-score" class="orange" />
+        <ScoreBar id="player-score" />
         <div class="centercontainer">
           <div class="totalscore">
             <canvas id="graph"></canvas>
           </div>
-          <div id="question" class="ui segment" style={{height: "10em", color: "black"}}>
-            {this.state.question}
+          <div id="question" class="ui segment" style={{height: "20vh", color: "black"}}>
+            <>
+            { this.state.question }
+            </>
           </div>
           <div class="ui hidden divider"></div>
-          <div class="ui middle aligned padded grid">
+          <div>
             {/* <div class="row"> ITEM TEMPLATE
               <div class="ui fluid big button">Something</div>
             </div> */}
             {this.state.answers.length > 0 &&
               this.state.answers.map((answer, i) => 
-                <div class="row">
-                  <button class="ui fluid big button" index={i} onClick={this.onAnswer}>{answer}</button>
+                <div style={{height: "10vh", margin: "0 0 1.5em"}}>
+                  <button class="ui fluid big button" index={i} onClick={this.onAnswer} style={{height: "10vh"}}>{answer}</button>
                 </div>
               )
             }
