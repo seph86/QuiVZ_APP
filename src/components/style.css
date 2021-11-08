@@ -98,7 +98,7 @@
 }
 
 .totalscore {
-  width: calc(100% - 2em);
+  width: 100%;
   height: 20vh;
   position: relative;
 }

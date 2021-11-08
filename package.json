@@ -6,11 +6,11 @@
     "chart.js": "^3.6.0",
     "chartjs-plugin-datalabels": "^2.0.0",
     "cra-append-sw": "^2.7.0",
+    "dompurify": "^2.3.3",
     "http-server": "^13.0.2",
     "inferno": "^7.4.10",
     "inferno-extras": "^7.4.10",
-    "inferno-scripts": "7.0.4",
-    "textfit": "^2.4.0"
+    "inferno-scripts": "7.0.4"
   },
   "scripts": {
     "start": "inferno-scripts start",
