@@ -3,7 +3,7 @@ import { render } from 'inferno';
 import { App, pointer } from './App';
 // eslint-disable-next-line
 import { Quiz } from './components/Quiz';
-import { Scanner } from './components/Scanner';
+import { Friends } from './components/Friends';
 import * as serviceWorker from './serviceWorker';
 
 const api_loc = "http://" + window.location.hostname + ":8080";
@@ -56,7 +56,7 @@ window.$.fn.form.settings.keyboardShortcuts = false;
 }
 
 
-render(<Scanner />, document.getElementById('root'));
+render(<Friends />, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
