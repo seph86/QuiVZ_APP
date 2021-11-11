@@ -42,20 +42,26 @@ export class ListUsers extends Component {
   }
 
   updateUser(event) {
-    // Could not get this to work =(
-    // let content = (event.target.attributes.isadmin && event.target.attributes.isadmin.value === "1" ? "<span class='ui text red>Revoke</span>" : "<span class='ui text green>Add</span>") + " admin privilages?"
-    // console.log(content);
+
+    let isAdmin = event.target.attributes.isadmin.value
+
     window.$("#admin-modal").modal({
-      content: "Set user to admin?",
+      content: isAdmin === "0" ? "Set user to admin?" : "Remove admin privilages?",
       onApprove: function() {
         window.$("body").api({
-          action: "make admin",
+          action: isAdmin === "0" ? "make admin" : "remove admin",
           urlData: {
             uuid: event.target.attributes.uuid.value
           },
           on: "now",
           onSuccess: function() {
-            console.log(window.$("span[uuid="+event.target.attributes.uuid.value+"]").parent().parent().find("i").removeClass("disabled"))
+            if (isAdmin === "1") {
+              window.$("span[uuid="+event.target.attributes.uuid.value+"]").parent().parent().find("i").addClass("disabled")
+              event.target.attributes.isadmin.value = "0"
+            } else {
+              window.$("span[uuid="+event.target.attributes.uuid.value+"]").parent().parent().find("i").removeClass("disabled")
+              event.target.attributes.isadmin.value = "1"
+            }
           },
           onFailure: function(response) {
             window.$("body").toast({
@@ -115,11 +121,10 @@ export class ListUsers extends Component {
                 {this.state.results && 
                   <div class="ui relaxed divided list">
                     <div class="item">
-                      <div class="right floated content"><h3>Admin</h3></div>
                       <div class="content"><h3>UUID</h3></div>
                     </div>
                     {this.state.results.map(data => (
-                      <div class="item">
+                      <div class="item" style={{overflow: "scroll hidden"}}>
                         <i class={(data[1] === "1" ? "" : "disabled" ) + " user cog big icon"}></i>
                         <div class="content">
                           <span class="ui big text" isadmin={data[1]} uuid={data[0]} onClick={this.updateUser}>{data[0]}</span>
