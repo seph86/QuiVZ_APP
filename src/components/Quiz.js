@@ -24,6 +24,7 @@ export class Quiz extends Component {
     this.addScore = this.addScore.bind(this);
     this.onOpponentAnswered = this.onOpponentAnswered.bind(this);
     this.onTrigger = this.onTrigger.bind(this);
+    this.endGame = this.endGame.bind(this);
 
     // non state variables
     this.points = 1000;
@@ -151,12 +152,13 @@ export class Quiz extends Component {
             }, 2000, self);
         } else {
           // Game has ended, show results screen
-          // setTimeout(() => {
-          //   window.$(".quiz").transition("fade out", "1000", () => {
-          //     // Load end screen
-          //     window.$(".endscreen").transition("fade in");
-          //   })
-          // }, 2000)
+          setTimeout(() => {
+            window.$(".quiz").transition("fade out", "1000", () => {
+              // Load end screen
+              window.$(".endscreen").transition("fade in");
+            })
+          }, 2000)
+          this.endGame()
         }
 
         clearInterval(self.timer);
@@ -244,6 +246,33 @@ export class Quiz extends Component {
     window.$("#opponent-score > div").removeClass("countingdown");
     window.$("#opponent-score .ui.progress").progress("set progress", event.data);
     this.addScore(1,event.type === "opponentRight" ? true : false);
+  }
+
+  // Update stats
+  endGame() {
+
+    // Does games exist?
+    if (window.localStorage.getItem("games"))
+      window.localStorage.setItem("games", eval(window.localStorage.getItem("games")) + 1)
+    else 
+      window.localStorage.setItem("games", 1);
+
+    // Does wins exist?
+    if (window.localStorage.getItem("wins")) {
+      if (this.state.scores[0] > this.state.scores[1])
+        window.localStorage.setItem("wins", eval(window.localStorage.getItem("wins")) + 1)
+    } else { 
+      window.localStorage.setItem("wins", 1);
+    }
+
+    let uuid = this.props.uuid;
+    window.quivzStats.setItem("friends", {[uuid]:{games: 20, wins:11} })
+
+    const self = this;
+    window.$(".endscreen").transition("fade out", "500ms", () => {
+      self.props.callback();
+    })
+
   }
 
   onTrigger() {
@@ -483,10 +512,27 @@ export class Quiz extends Component {
           </div>
           <ScoreBar id="opponent-score" /> 
         </div>
-        <div class="endscreen" style={{display: "none"}}>
-          <h1>Final results!</h1>
-          {this.state.scores[0]}
-          <div class="ui green button" onclick={() => {window.$(".endscreen").transition("fade out", "500ms", () => {this.props.endGame()})}}>Return to menu</div>
+        <div class="ui container endscreen" style={{display: "none"}}>
+          <div class="ui one column centered grid" style={{height: "50vh", "margin-top": "20vh"}}>
+            <div class="row">
+              <h1>Final results!</h1>
+            </div>
+            <div class="row">
+              <h2>{this.state.scores[0]}</h2>
+            </div>
+            <div class="row">
+              <h1>
+                {this.state.scores[0] === this.state.scores[1] && "Draw"}
+                {this.state.scores[0] > this.state.scores[1] && "You Won!"}
+                {this.state.scores[0] < this.state.scores[1] && "Oof, not this time =("}
+              </h1>
+            </div>
+            <div class="row">
+              <div>
+                <div class="ui green button" onclick={this.endGame}>Return to menu</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     )

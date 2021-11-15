@@ -4,6 +4,7 @@ import { App, pointer } from './App';
 import * as serviceWorker from './serviceWorker';
 import localforage from 'localforage';
 import { Listener } from './common/EventListener';
+//import { Quiz } from './components/Quiz';
 
 // const api_loc = "http://" + window.location.hostname + ":8080";
 const api_loc = "http://" + window.location.hostname + "/api";

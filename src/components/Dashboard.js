@@ -10,6 +10,7 @@ import { ListUsers } from './ListUsers';
 import { Listener } from '../common/EventListener';
 import { Friends } from './Friends';
 import { Quiz } from './Quiz';
+import { TestPanel } from './TestPanel';
 
 export class Dashboard extends Component {
 
@@ -22,12 +23,14 @@ export class Dashboard extends Component {
       inGame: false,
       opponent: null,
       singlePlayer: false,
+      friends: [],
     };
 
     this.updateUsername = this.updateUsername.bind(this);
     this.updateAdmin = this.updateAdmin.bind(this);
     this.startQuiz = this.startQuiz.bind(this);
     this.onRecieveChallenge = this.onRecieveChallenge.bind(this);
+    this.onBackFromQuiz = this.onBackFromQuiz.bind(this);
 
     // Connect to Event Server
     Listener.connect();
@@ -136,11 +139,8 @@ export class Dashboard extends Component {
       // We dont know who this is so we'll ignore the request
       return;
     }
-
-    
+ 
   }
-
-
 
   componentDidMount(){
 
@@ -174,6 +174,11 @@ export class Dashboard extends Component {
     window.$(".ui.progress").progress({className: {active: "none"}})
   }
 
+  onBackFromQuiz() {
+    this.setState({inGame:false});
+    window.$(findDOMNode(this)).transition("fade in");
+  }
+
   render() {
     return(
       <>
@@ -193,21 +198,19 @@ export class Dashboard extends Component {
               </div>
               <ListUsers />
               <Test />
-              {/* <TestPanel onClick={() => {
-                window.$("body").api({
-                  on: "now",
-                  action: "add friend",
-                  urlData: {
-                    uuid: "2da7254099a25c407c10a098f43bf1a978ca0bd512fca9a65d9da3b5729ebb18",
-                    from: "user"
-                  }
-                })
-              }}/> */}
+              <TestPanel onClick={() => {
+                this.setState({inGame: true});
+              }}/>
             </> }
           </div>
         </div>
         :
-        <Quiz singlePlayer={this.state.singlePlayer} opponent={this.state.opponent}/>
+        <Quiz 
+          singlePlayer={this.state.singlePlayer} 
+          opponent={this.state.opponent}
+          uuid={this.state.uuid}
+          callback={this.onBackFromQuiz}
+          />
       }
       </>
     );
@@ -217,42 +220,46 @@ export class Dashboard extends Component {
 
 function DrawWins(props) {
 
+  console.log(props);
+
   let games = window.localStorage.getItem("games")
   let wins = window.localStorage.getItem("wins")
   let percent = Math.floor((wins / games) * 100);
 
-  //console.log(props);
-  if (games)
-    return(
-      <div id="stats" class="ui segment inverted grey hidden">
-        <h2>Stats</h2>
-        <div class="ui small centered image">
-          <svg viewBox="0 0 36 36">
-            <path
-              className="ring-circle"
-              d="m 18,2.0845 a -15.9155,15.9155 0 0 0 0,31.831 -15.9155,15.9155 0 0 0 0,-31.831"
-              strokeDasharray={percent + ", 100"}
-            />
-          </svg>
-          <span class="ui header huge" style={{position: "absolute", top: "23%", width: "100%","text-align":"center" }}>{percent}%</span>
-        </div>
-        <div class="ui divider"></div>
-        {props.friends && props.friends.map((friend) => {
-          return friend[1].stats ?
-            <div class="ui indicating progress" data-percent={Math.floor((friend[1].stats.wins/friend[1].stats.games)*100)}>
+  return(
+    <div id="stats" class="ui segment inverted grey hidden">
+      <h2>Stats</h2>
+      <div class="ui small centered image">
+        {games ?
+          <>  
+            <svg viewBox="0 0 36 36">
+              <path
+                className="ring-circle"
+                d="m 18,2.0845 a -15.9155,15.9155 0 0 0 0,31.831 -15.9155,15.9155 0 0 0 0,-31.831"
+                strokeDasharray={percent + ", 100"}
+              />
+            </svg>
+            <span class="ui header huge" style={{position: "absolute", top: "23%", width: "100%","text-align":"center" }}>{percent}%</span>
+          </>
+          :
+          <h2>No Data</h2>
+        }
+      </div>
+      <div class="ui divider"></div>
+      {props.friends && console.log(props.friends) && props.friends.map((friend) => 
+        <>
+          {friend[1].games && console.log(friend) &&
+            <div class="ui indicating progress" data-percent={Math.floor((friend[1].wins/friend[1].games)*100)}>
               <div class="bar">
                 <div class="progress"></div>
               </div>
               <div class="label">{friend[1].name}</div>
             </div>
-          :
-            <></>
           }
-        )}
-      </div>
-    )
-  else 
-    return(<></>);
+        </>
+      )}
+    </div>
+  )
 }
 
 class DashboardHeader extends Component {
@@ -282,8 +289,6 @@ class Settings extends Component {
 
   constructor(props) {
     super(props);
-
-    
 
     // Hopefully will compile to be obfuscated enough
     this.isAdmin = window.localStorage.getItem("conditional") === createHash('sha256').update( window.localStorage.getItem("uuid") + [0xb1, 0x4f, 0x6c, 0x79, 0xf8, 0xac].reduce((a,b)=>a.toString(16)+b.toString(16))).digest("hex")
