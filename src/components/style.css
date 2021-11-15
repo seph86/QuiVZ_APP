@@ -55,7 +55,6 @@
 .transition.expand-menu {
   animation-name: expand-background;
 }
-
 @keyframes expand-background {
   0% {
     width:0; left: 50%;
@@ -70,6 +69,82 @@
     top: 0; height: 100vh;
   }
 }
+
+.transition.spin-logo {
+  animation-name: spin-logo;
+}
+@keyframes spin-logo {
+  0% {
+    width:0;
+    transform: rotate(0);
+  }
+  100% {
+    width: 40%;
+    transform: rotate(720deg);
+  }
+}
+
+.transition.slide-title {
+  animation-name: slide-title;
+  animation-timing-function: linear;
+}
+@keyframes slide-title {
+  0% {
+    left: -20vw;
+  }
+  10% {
+    left: 20vw;
+  }
+  80% {
+    left: 30vw;
+  }
+  100% {
+    left: 200vw;
+  }
+}
+.transition.slide-title-reverse {
+  animation-name: slide-title-reverse;
+  animation-timing-function: linear;
+}
+@keyframes slide-title-reverse {
+  0% {
+    left: 110vw;
+  }
+  10% {
+    left: 60vw;
+  }
+  80% {
+    left: 50vw;
+  }
+  100% {
+    left: -200vw;
+  }
+}
+
+
+.transition.show-player-bar {
+  animation-name: show-player-bar;
+}
+@keyframes show-player-bar {
+  0% {
+    left: 0em;
+  }
+  100% {
+    left: 1em;
+  }
+}
+.transition.show-opponent-bar {
+  animation-name: show-opponent-bar;
+}
+@keyframes show-opponent-bar {
+  0% {
+    right: 0em;
+  }
+  100% {
+    right: 1em;
+  }
+}
+
 
 #search-results{ 
   max-height: 40rem;

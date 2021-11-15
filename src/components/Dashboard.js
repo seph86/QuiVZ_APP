@@ -1,13 +1,15 @@
 import { Component } from 'inferno';
 import { findDOMNode } from 'inferno-extras';
+import purify from 'dompurify';
 import { Challenge } from './Challenge';
 import { Test } from './Test';
-import { SearchCategories } from './SearchCategories';
-import { AllCategories } from './AllCategories';
 import { Form, Field, Button, Nag } from '../fomantic/Fomantic';
 import { createHash } from 'crypto';
 import './style.css';
 import { ListUsers } from './ListUsers';
+import { Listener } from '../common/EventListener';
+import { Friends } from './Friends';
+import { Quiz } from './Quiz';
 
 export class Dashboard extends Component {
 
@@ -16,70 +18,241 @@ export class Dashboard extends Component {
 
     this.state = {
       username: window.localStorage.getItem("name"),
-      isAdmin: process.env.NODE_ENV === 'development' // Dev mode testing
+      isAdmin: process.env.NODE_ENV === 'development', // Dev mode testing
+      inGame: false,
+      opponent: null,
+      singlePlayer: false,
     };
 
     this.updateUsername = this.updateUsername.bind(this);
     this.updateAdmin = this.updateAdmin.bind(this);
+    this.startQuiz = this.startQuiz.bind(this);
+    this.onRecieveChallenge = this.onRecieveChallenge.bind(this);
+
+    // Connect to Event Server
+    Listener.connect();
+
   }
 
   updateUsername(username) {
     this.setState({username: username});
     window.localStorage.setItem("name", username);
+    window.localStorage.setItem("qrCode", null);
   }
 
   updateAdmin(newState) {
     this.setState({isAdmin: newState});
   }
 
+  startQuiz(uuid, name) {
+
+    const self = this;
+    window.$(findDOMNode(this)).transition({
+      animation: "fade out",
+      onComplete: () => {
+        self.setState({inGame: true})
+      }
+    })
+    window.$("body").api({
+      on: "now",
+      action: "get quiz"
+    })
+
+  }
+
+  onRecieveChallenge(event) {
+
+    let friend = null;
+    for (let i in this.state.friends) {
+      if (this.state.friends[i][0] === event.data) {
+        friend = this.state.friends[i];
+        break;
+      }
+    }
+
+    if (friend) {
+
+      if (this.state.inGame) {
+        window.$("body").api({
+          on: "now",
+          action: "reject challenge",
+          urlData: {
+            uuid: friend[0]
+          }
+        });
+        return;
+      }
+
+      const self = this;
+      window.$("body").toast({
+        title: purify.sanitize(friend[1].name) + " has requested a challenge, do you accept?",
+        displayTime: 3000,
+        position: "top attached",
+        class: "blue",
+        classActions: "bottom attached",
+        showProgress: "top",
+        classProgress: "yellow",
+        actions: [
+          {
+            text: "Yes",
+            class: "green",
+            click: () => {
+              //console.log("accepted");
+              window.$("body").api({
+                action: "accept challenge",
+                on: "now",
+                urlData: {
+                  uuid: friend[0],
+                  gameID: event.data
+                },
+                onSuccess: () => {
+                  window.$(findDOMNode(this)).transition({
+                    animation: "fade out",
+                    onComplete: () => {
+                      self.setState({inGame: true, singlePlayer: false, opponent: friend[1].name})
+                    }
+                  })
+                }
+              })
+            }
+          },
+          {
+            text: "No",
+            class: "red",
+            click: () => {
+              //console.log("rejected");
+              window.$("body").api({
+                action: "reject challenge",
+                on: "now",
+                urlData: {
+                  uuid: friend[0]
+                }
+              })
+            }
+          }
+        ]
+      })
+    } else {
+      // We dont know who this is so we'll ignore the request
+      return;
+    }
+
+    
+  }
+
+
+
   componentDidMount(){
+
+    // Listen to incoming challenges
+    Listener.src.addEventListener("challenge", this.onRecieveChallenge);
+
     window.$('#dashboard-group .segment')
     .transition({
       animation : 'pulse',
       reverse   : 'auto', // default setting
       interval  : 100
     });
+
+    // Load friends
+    const self = this;
+    window.quivzStats.getItem("friends").then((collection) => {
+      let temp = [];
+      for (let item in collection) {
+        temp.push([item, collection[item]]);
+      }
+      self.setState({friends: temp});
+    });
+  }
+
+  componentWillUnmount() {
+    // Clean up event handler
+    Listener.src.removeEventListener("challenge", this.onRecieveChallenge);
+  }
+
+  componentDidUpdate() {
+    window.$(".ui.progress").progress({className: {active: "none"}})
   }
 
   render() {
     return(
-      <div class="ui container">
-        <Settings username={this.state.username} updateUsername={this.updateUsername} updateAdmin={this.updateAdmin} onLogout={this.props.setLoggedIn}/>
-        <div id="dashboard-group">
-          <Nag id="nointernet" color="red">No internet connection</Nag>
-          <DashboardHeader username={this.state.username}/>
-          <div class="ui segment inverted grey">
-            <h2>Wins</h2>
-            <DrawWins></DrawWins>
+      <>
+      {!this.state.inGame
+        ? 
+        <div class="ui container">
+          <Settings username={this.state.username} updateUsername={this.updateUsername} updateAdmin={this.updateAdmin} onLogout={this.props.setLoggedIn}/>
+          <div id="dashboard-group">
+            <Nag id="nointernet" color="red">No internet connection</Nag>
+            <DashboardHeader username={this.state.username}/>
+            <Challenge callback={this.startQuiz}/>
+            <Friends />
+            <DrawWins friends={this.state.friends}/>
+            { this.state.isAdmin && <>
+              <div class="ui basic segment hidden">
+                <h2>Admin options</h2>
+              </div>
+              <ListUsers />
+              <Test />
+              {/* <TestPanel onClick={() => {
+                window.$("body").api({
+                  on: "now",
+                  action: "add friend",
+                  urlData: {
+                    uuid: "2da7254099a25c407c10a098f43bf1a978ca0bd512fca9a65d9da3b5729ebb18",
+                    from: "user"
+                  }
+                })
+              }}/> */}
+            </> }
           </div>
-          <Challenge />
-          <SearchCategories />
-          <AllCategories />
-          { this.state.isAdmin && <>
-            <h2>Admin options</h2>
-            <ListUsers />
-            <Test />
-          </> }
         </div>
-
-      </div>
+        :
+        <Quiz singlePlayer={this.state.singlePlayer} opponent={this.state.opponent}/>
+      }
+      </>
     );
   }
 
 }
 
 function DrawWins(props) {
-  return(
-    <div class="ui small centered image">
-      <svg viewBox="0 0 36 36">
-        <path
-          className="ring-circle"
-          d="m 18,2.0845 a -15.9155,15.9155 0 0 0 0,31.831 -15.9155,15.9155 0 0 0 0,-31.831"
-          strokeDasharray="74, 100"
-        />
-      </svg>
-    </div>
-  )
+
+  let games = window.localStorage.getItem("games")
+  let wins = window.localStorage.getItem("wins")
+  let percent = Math.floor((wins / games) * 100);
+
+  //console.log(props);
+  if (games)
+    return(
+      <div id="stats" class="ui segment inverted grey hidden">
+        <h2>Stats</h2>
+        <div class="ui small centered image">
+          <svg viewBox="0 0 36 36">
+            <path
+              className="ring-circle"
+              d="m 18,2.0845 a -15.9155,15.9155 0 0 0 0,31.831 -15.9155,15.9155 0 0 0 0,-31.831"
+              strokeDasharray={percent + ", 100"}
+            />
+          </svg>
+          <span class="ui header huge" style={{position: "absolute", top: "23%", width: "100%","text-align":"center" }}>{percent}%</span>
+        </div>
+        <div class="ui divider"></div>
+        {props.friends && props.friends.map((friend) => {
+          return friend[1].stats ?
+            <div class="ui indicating progress" data-percent={Math.floor((friend[1].stats.wins/friend[1].stats.games)*100)}>
+              <div class="bar">
+                <div class="progress"></div>
+              </div>
+              <div class="label">{friend[1].name}</div>
+            </div>
+          :
+            <></>
+          }
+        )}
+      </div>
+    )
+  else 
+    return(<></>);
 }
 
 class DashboardHeader extends Component {
@@ -153,9 +326,6 @@ class Settings extends Component {
       }
     });
 
-    if (window.localStorage.getItem("allow-friends") !== undefined)
-      window.$("#friend-requests").prop("checked", window.localStorage.getItem("allow-friends") === "true" ? true : false);
-
     if (window.localStorage.getItem("theme") !== undefined)
       window.$("#light-theme").prop("checked", window.localStorage.getItem("theme") === "light" ? true : false);
 
@@ -196,10 +366,6 @@ class Settings extends Component {
         event.preventDefault();
       }
     })
-  }
-
-  toggleFriends() {
-    window.localStorage.setItem("allow-friends",window.$("#friend-requests").prop("checked"));
   }
 
   changeTheme(){
@@ -247,13 +413,6 @@ class Settings extends Component {
             <div class="ui error message"></div>
           </Form>
         </div>
-        <div class="six wide column">
-          <div class="ui toggle checkbox">
-            <input id="friend-requests" type="checkbox" onClick={this.toggleFriends}/>
-            <label></label>
-          </div>
-        </div>
-        <div class="right aligned ten wide column"><h3>Allow friend requests</h3></div>
         <div class="six wide column">
           <div class="ui toggle checkbox">
             <input id="light-theme" type="checkbox" onClick={this.changeTheme}/>
