@@ -7,11 +7,13 @@
     "chartjs-plugin-datalabels": "^2.0.0",
     "cra-append-sw": "^2.7.0",
     "dompurify": "^2.3.3",
+    "emojis-keywords": "^2.0.0",
     "html5-qrcode": "^2.1.2",
     "http-server": "^13.0.2",
     "inferno": "^7.4.10",
     "inferno-extras": "^7.4.10",
     "inferno-scripts": "7.0.4",
+    "localforage": "^1.10.0",
     "pure-svg-code": "^1.0.6"
   },
   "scripts": {
