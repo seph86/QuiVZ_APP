@@ -225,15 +225,23 @@ export class Dashboard extends Component {
 
 function DrawWins(props) {
 
-  let games = window.localStorage.getItem("games")
-  let wins = window.localStorage.getItem("wins")
+  let games = 0 // = window.localStorage.getItem("games")
+  let wins = 0 // = window.localStorage.getItem("wins")
+
+  for(let i in props.friends) {
+    if (props.friends[i][1].games !== undefined) {
+      games += parseInt(props.friends[i][1].games)
+      wins += parseInt(props.friends[i][1].wins)
+    }
+  }
+
   let percent = Math.floor((wins / games) * 100);
 
   return(
     <div id="stats" class="ui segment inverted grey hidden">
       <h2>Stats</h2>
-      <div class={ games && "ui small centered image"} >
-        {games ?
+      <div class={ games > 0 && "ui small centered image"} >
+        {games > 0 ?
           <>  
             <svg viewBox="0 0 36 36">
               <path
@@ -251,7 +259,7 @@ function DrawWins(props) {
       <div class="ui divider"></div>
       {props.friends && 
         props.friends.map(function(friend) { 
-          if (friend[1].games === undefined) return;
+          if (friend[1].games === undefined) return(null);
           return(
             <>
             {friend[1].name}
