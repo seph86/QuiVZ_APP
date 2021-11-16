@@ -253,14 +253,14 @@ export class Quiz extends Component {
 
     // Does games exist?
     if (window.localStorage.getItem("games"))
-      window.localStorage.setItem("games", eval(window.localStorage.getItem("games")) + 1)
+      window.localStorage.setItem("games", parseInt(window.localStorage.getItem("games")) + 1)
     else 
       window.localStorage.setItem("games", 1);
 
     // Does wins exist?
     if (window.localStorage.getItem("wins")) {
       if (this.state.scores[0] > this.state.scores[1])
-        window.localStorage.setItem("wins", eval(window.localStorage.getItem("wins")) + 1)
+        window.localStorage.setItem("wins", parseInt(window.localStorage.getItem("wins")) + 1)
     } else { 
       window.localStorage.setItem("wins", 1);
     }
