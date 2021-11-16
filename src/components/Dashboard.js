@@ -31,6 +31,7 @@ export class Dashboard extends Component {
     this.startQuiz = this.startQuiz.bind(this);
     this.onRecieveChallenge = this.onRecieveChallenge.bind(this);
     this.onBackFromQuiz = this.onBackFromQuiz.bind(this);
+    this.updateFriendData = this.updateFriendData.bind(this);
 
     // Connect to Event Server
     Listener.connect();
@@ -45,6 +46,10 @@ export class Dashboard extends Component {
 
   updateAdmin(newState) {
     this.setState({isAdmin: newState});
+  }
+
+  updateFriendData(uuid, data) {
+
   }
 
   startQuiz(uuid, name) {
@@ -220,8 +225,6 @@ export class Dashboard extends Component {
 
 function DrawWins(props) {
 
-  console.log(props);
-
   let games = window.localStorage.getItem("games")
   let wins = window.localStorage.getItem("wins")
   let percent = Math.floor((wins / games) * 100);
@@ -229,7 +232,7 @@ function DrawWins(props) {
   return(
     <div id="stats" class="ui segment inverted grey hidden">
       <h2>Stats</h2>
-      <div class="ui small centered image">
+      <div class={ games && "ui small centered image"} >
         {games ?
           <>  
             <svg viewBox="0 0 36 36">
@@ -246,17 +249,20 @@ function DrawWins(props) {
         }
       </div>
       <div class="ui divider"></div>
-      {props.friends && console.log(props.friends) && props.friends.map((friend) => 
-        <>
-          {friend[1].games && console.log(friend) &&
-            <div class="ui indicating progress" data-percent={Math.floor((friend[1].wins/friend[1].games)*100)}>
+      {props.friends && 
+        props.friends.map(function(friend) { 
+          if (friend[1].games === undefined) return;
+          return(
+            <>
+            {friend[1].name}
+            <div class="ui slow indicating progress" data-percent={Math.floor((friend[1].wins/friend[1].games)*100)}>
               <div class="bar">
-                <div class="progress"></div>
+                <div class="progress centered"></div>
               </div>
-              <div class="label">{friend[1].name}</div>
             </div>
-          }
-        </>
+            </>
+          )
+        }
       )}
     </div>
   )
