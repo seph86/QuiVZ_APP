@@ -21,13 +21,7 @@ export class Signup extends Component {
               type: 'validPassword',
               prompt: "Password must be 15 characters containg at least 1 uppercase, 1 lowercase, and 1 digit"
             }
-          ],
-          onValid: function(field) {
-            console.log("valid?");
-          },
-          onInvalid: function(field) {
-            console.log("invalid?");
-          }
+          ]
         },
         password_confirm: ["match[password]", "empty"]
       }
