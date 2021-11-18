@@ -10,6 +10,7 @@ export class Listener {
     window.debugListener = Listener;
     Listener.src.onopen = () => { window.$("#nointernet").nag("hide") }
     Listener.src.onerror = () => { window.$("#nointernet").nag("show") };
+    Listener.src.onmessage = () => { window.$("#nointernet").nag("show") };
   }
 
 }
