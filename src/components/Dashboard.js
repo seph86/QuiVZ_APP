@@ -23,7 +23,7 @@ export class Dashboard extends Component {
       inGame: false,
       opponent: null,
       singlePlayer: false,
-      friends: [],
+      friends: window.quivzStats,
     };
 
     this.updateUsername = this.updateUsername.bind(this);
@@ -49,7 +49,10 @@ export class Dashboard extends Component {
   }
 
   updateFriendData(uuid, data) {
-
+    const self = this;
+    window.quivzStatsInstance.setItem(uuid, {name: data.name, games: data.games, wins: data.wins}).then(() => {
+      self.setState( prevState => ( {friends: {...prevState.friends, [uuid]: {name: data.name, games: data.games, wins: data.wins}}} ) )
+    });
   }
 
   startQuiz(uuid, name) {
@@ -159,15 +162,11 @@ export class Dashboard extends Component {
       interval  : 100
     });
 
-    // Load friends
-    const self = this;
-    window.quivzStats.getItem("friends").then((collection) => {
-      let temp = [];
-      for (let item in collection) {
-        temp.push([item, collection[item]]);
-      }
-      self.setState({friends: temp});
-    });
+    window.$("#username-nag").nag({key: "username"});
+
+    // Make progress bars look nice
+    window.$(".ui.progress").progress({className: {active: "none", success: "none"}})
+
   }
 
   componentWillUnmount() {
@@ -176,7 +175,7 @@ export class Dashboard extends Component {
   }
 
   componentDidUpdate() {
-    window.$(".ui.progress").progress({className: {active: "none"}})
+    window.$(".ui.progress").progress({className: {active: "none", success: "none"}})
   }
 
   onBackFromQuiz() {
@@ -194,6 +193,7 @@ export class Dashboard extends Component {
           <div id="dashboard-group">
             <Nag id="nointernet" color="red">No internet connection</Nag>
             <DashboardHeader username={this.state.username}/>
+            <Nag id="username-nag" close>You can change your name in settings (<i class="cog icon"></i>)</Nag>
             <Challenge callback={this.startQuiz}/>
             <Friends />
             <DrawWins friends={this.state.friends}/>
@@ -204,7 +204,9 @@ export class Dashboard extends Component {
               <ListUsers />
               <Test />
               <TestPanel onClick={() => {
-                this.setState({inGame: true});
+                //self.setState( prevState => ( {friends: {...prevState.friends, [uuid]: {name: data.name, games: data.games, wins: data.wins}}} ) )
+                let test = this.state.friends.Testuuid;
+                this.setState(prevState => ({friends: {...prevState.friends,  ["Testuuid"]: { name:  test.name, games: ++test.games, wins: test.wins + (Math.random() > 0.5 ? 1 : 0)}}}));
               }}/>
             </> }
           </div>
@@ -225,13 +227,15 @@ export class Dashboard extends Component {
 
 function DrawWins(props) {
 
-  let games = 0 // = window.localStorage.getItem("games")
-  let wins = 0 // = window.localStorage.getItem("wins")
+  let games = 0, wins = 0
 
-  for(let i in props.friends) {
-    if (props.friends[i][1].games !== undefined) {
-      games += parseInt(props.friends[i][1].games)
-      wins += parseInt(props.friends[i][1].wins)
+  console.log(props);
+
+  for (const [uuid, data] of Object.entries(props.friends) ) {
+    console.log(uuid,data)
+    if (data.games !== undefined) {
+      games += parseInt(data.games)
+      wins += parseInt(data.wins)
     }
   }
 
@@ -253,25 +257,22 @@ function DrawWins(props) {
             <span class="ui header huge" style={{position: "absolute", top: "23%", width: "100%","text-align":"center" }}>{percent}%</span>
           </>
           :
-          <h2>No Data</h2>
+          <h3>No Data</h3>
         }
       </div>
       <div class="ui divider"></div>
       {props.friends && 
-        props.friends.map(function(friend) { 
-          if (friend[1].games === undefined) return(null);
-          return(
-            <>
-            {friend[1].name}
-            <div class="ui slow indicating progress" data-percent={Math.floor((friend[1].wins/friend[1].games)*100)}>
-              <div class="bar">
-                <div class="progress centered"></div>
-              </div>
+        Object.entries(props.friends).map((friend, index) =>
+          <>
+          {friend[1].name}
+          <div key={index.toString()} class="ui slow indicating progress" data-percent={Math.floor((friend[1].wins/friend[1].games)*100)} style={{margin: "0 0 1rem 0"}}>
+            <div class="bar">
+              <div class="progress centered"></div>
             </div>
-            </>
-          )
-        }
-      )}
+          </div>
+          </>
+        )
+      }
     </div>
   )
 }

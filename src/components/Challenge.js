@@ -13,7 +13,6 @@ export class Challenge extends Component {
       svg: null,
       isOpen: false,
       waiting: false,
-      friends: [],
       uuid: "",
       name: ""
     }
@@ -30,21 +29,16 @@ export class Challenge extends Component {
 
   componentDidMount() {
 
-    const self = this;
-    window.quivzStats.getItem("friends").then((collection) => {
-      let temp = [];
-      for (let item in collection) {
-        temp.push([item, collection[item]]);
-      }
-      self.setState({friends: temp});
-    });
-
     Listener.src.addEventListener("response", this.onRecieveReponse);
 
   }
 
   componentWillUnmount() {
     Listener.src.removeEventListener("response", this.onRecieveReponse);
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (nextState.isOpen) return true;
   }
 
   onRecieveReponse(event) {

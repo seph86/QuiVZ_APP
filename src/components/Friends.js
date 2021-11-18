@@ -15,7 +15,6 @@ export class Friends extends Component {
       svg: null,
       isOpen: false,
       showScanner: false,
-      friends: [],
     }
 
     this.revealCode = false;
@@ -65,30 +64,10 @@ export class Friends extends Component {
       }
     })
 
-    const self = this;
-    window.quivzStats.setItem("friends", { [uuid]: {name: name} }).then(() => {
-      window.quivzStats.getItem("friends").then((collection) => {
-        let temp = [];
-        for (let item in collection) {
-          temp.push([item, collection[item]]);
-        }
-        self.setState({friends: temp});
-      });
-    });
-
     this.setState({showScanner: false})
   }
 
   componentDidMount() {
-
-    const self = this;
-    window.quivzStats.getItem("friends").then((collection) => {
-      let temp = [];
-      for (let item in collection) {
-        temp.push([item, collection[item]]);
-      }
-      self.setState({friends: temp});
-    });
 
     if (!window.localStorage.getItem("qrCode")) {
       let code = qrcode({
@@ -113,17 +92,12 @@ export class Friends extends Component {
     // Only accept friend requests while the qrCode is visible
     if (this.revealCode) {
       // Add friend to local storage db and update the frinds list
-      const self = this;
-      window.quivzStats.setItem("friends", { [json.uuid]: {name: json.username} }).then(() => {
-        window.quivzStats.getItem("friends").then((collection) => {
-          let temp = [];
-          for (let item in collection) {
-            temp.push([item, collection[item]]);
-          }
-          self.setState({friends: temp});
-        });
-      });
+      
     }
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (nextState.isOpen) return true;
   }
 
   componentDidUpdate() {
