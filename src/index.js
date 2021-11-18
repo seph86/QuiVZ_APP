@@ -7,10 +7,10 @@ import { Listener } from './common/EventListener';
 //import { Quiz } from './components/Quiz';
 
 // const api_loc = "http://" + window.location.hostname + ":8080";
-const api_loc = "http://" + window.location.hostname + "/api";
+const api_loc = "https://" + window.location.hostname + "/api";
 
 // Prep event listener
-Listener.url = "http://" + window.location.hostname + "/sse";
+Listener.url = "https://" + window.location.hostname + "/sse";
 
 // end point actions
 window.$.fn.api.settings.api = {
@@ -58,7 +58,12 @@ window.$.fn.api.settings.onFailure = function(response, element, xhr) {
 window.$.fn.form.settings.keyboardShortcuts = false;
 
 // Create stats data store
-window.quivzStats = localforage.createInstance({ name: "QuiVZ_stats" });
+window.quivzStatsInstance = localforage.createInstance({ name: "QuiVZ_stats" });
+window.quivzStats = {}
+// We try to load the friends list now to use later because async loading doesnt work well with react states
+window.quivzStatsInstance.iterate((value, key) => {
+  window.quivzStats[key] = value;
+})
 
 {
   let store = window.localStorage;
