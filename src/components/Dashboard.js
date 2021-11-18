@@ -32,6 +32,7 @@ export class Dashboard extends Component {
     this.onRecieveChallenge = this.onRecieveChallenge.bind(this);
     this.onBackFromQuiz = this.onBackFromQuiz.bind(this);
     this.updateFriendData = this.updateFriendData.bind(this);
+    this.onDeleteFriend = this.onDeleteFriend.bind(this);
 
     // Connect to Event Server
     Listener.connect();
@@ -49,10 +50,21 @@ export class Dashboard extends Component {
   }
 
   updateFriendData(uuid, data) {
-    const self = this;
-    window.quivzStatsInstance.setItem(uuid, {name: data.name, games: data.games, wins: data.wins}).then(() => {
-      self.setState( prevState => ( {friends: {...prevState.friends, [uuid]: {name: data.name, games: data.games, wins: data.wins}}} ) )
-    });
+    // On creating a new friend, set stats to 0
+    if (!data.games){
+      data.games = 0;
+      data.wins = 0;
+    }
+    window.quivzStatsInstance.setItem(uuid, {name: data.name, games: data.games, wins: data.wins})
+    this.setState( prevState => ( {friends: {...prevState.friends, [uuid]: {name: data.name, games: data.games, wins: data.wins}}} ) )
+  }
+
+  onDeleteFriend(uuid) {
+    window.quivzStatsInstance.removeItem(uuid);
+    this.setState( prevState => { 
+      delete prevState.friends[uuid]
+      return {friends: {...prevState.friends}} 
+    })
   }
 
   startQuiz(uuid, name) {
@@ -73,22 +85,18 @@ export class Dashboard extends Component {
 
   onRecieveChallenge(event) {
 
-    let friend = null;
-    for (let i in this.state.friends) {
-      if (this.state.friends[i][0] === event.data) {
-        friend = this.state.friends[i];
-        break;
-      }
-    }
+    //debugger
 
-    if (friend) {
+    // Is this someone we know?
+    if (this.state.friends[event.data]) {
 
+      // Are we already in a game? Reject automatically
       if (this.state.inGame) {
         window.$("body").api({
           on: "now",
           action: "reject challenge",
           urlData: {
-            uuid: friend[0]
+            uuid: event.data
           }
         });
         return;
@@ -96,7 +104,7 @@ export class Dashboard extends Component {
 
       const self = this;
       window.$("body").toast({
-        title: purify.sanitize(friend[1].name) + " has requested a challenge, do you accept?",
+        title: purify.sanitize(this.state.friends[event.data].name) + " has requested a challenge, do you accept?",
         displayTime: 3000,
         position: "top attached",
         class: "blue",
@@ -108,19 +116,17 @@ export class Dashboard extends Component {
             text: "Yes",
             class: "green",
             click: () => {
-              //console.log("accepted");
               window.$("body").api({
                 action: "accept challenge",
                 on: "now",
                 urlData: {
-                  uuid: friend[0],
-                  gameID: event.data
+                  uuid: event.data
                 },
                 onSuccess: () => {
                   window.$(findDOMNode(this)).transition({
                     animation: "fade out",
                     onComplete: () => {
-                      self.setState({inGame: true, singlePlayer: false, opponent: friend[1].name})
+                      self.setState({inGame: true, singlePlayer: false, opponent: this.state.friends[event.data].name})
                     }
                   })
                 }
@@ -136,7 +142,7 @@ export class Dashboard extends Component {
                 action: "reject challenge",
                 on: "now",
                 urlData: {
-                  uuid: friend[0]
+                  uuid: this.state.friends[event.data]
                 }
               })
             }
@@ -162,7 +168,7 @@ export class Dashboard extends Component {
       interval  : 100
     });
 
-    window.$("#username-nag").nag({key: "username"});
+    //window.$("#username-nag").nag({key: "username"});
 
     // Make progress bars look nice
     window.$(".ui.progress").progress({className: {active: "none", success: "none"}})
@@ -175,6 +181,7 @@ export class Dashboard extends Component {
   }
 
   componentDidUpdate() {
+    // Style progress bars
     window.$(".ui.progress").progress({className: {active: "none", success: "none"}})
   }
 
@@ -194,8 +201,8 @@ export class Dashboard extends Component {
             <Nag id="nointernet" color="red">No internet connection</Nag>
             <DashboardHeader username={this.state.username}/>
             <Nag id="username-nag" close>You can change your name in settings (<i class="cog icon"></i>)</Nag>
-            <Challenge callback={this.startQuiz}/>
-            <Friends />
+            <Challenge callback={this.startQuiz} friends={this.state.friends}/>
+            <Friends addFriend={this.updateFriendData} friends={this.state.friends} onDeleteFriend={this.onDeleteFriend}/>
             <DrawWins friends={this.state.friends}/>
             { this.state.isAdmin && <>
               <div class="ui basic segment hidden">
@@ -205,8 +212,8 @@ export class Dashboard extends Component {
               <Test />
               <TestPanel onClick={() => {
                 //self.setState( prevState => ( {friends: {...prevState.friends, [uuid]: {name: data.name, games: data.games, wins: data.wins}}} ) )
-                let test = this.state.friends.Testuuid;
-                this.setState(prevState => ({friends: {...prevState.friends,  ["Testuuid"]: { name:  test.name, games: ++test.games, wins: test.wins + (Math.random() > 0.5 ? 1 : 0)}}}));
+                let test = this.state.friends["fc5b9aa7adfdad676c929220ca11d34341f7fac5826ba05fb6d51ae5a1776a38"];
+                this.setState(prevState => ({friends: {...prevState.friends,  ["fc5b9aa7adfdad676c929220ca11d34341f7fac5826ba05fb6d51ae5a1776a38"]: { name:  test.name, games: ++test.games, wins: test.wins + (Math.random() > 0.5 ? 1 : 0)}}}));
               }}/>
             </> }
           </div>
@@ -229,10 +236,7 @@ function DrawWins(props) {
 
   let games = 0, wins = 0
 
-  console.log(props);
-
   for (const [uuid, data] of Object.entries(props.friends) ) {
-    console.log(uuid,data)
     if (data.games !== undefined) {
       games += parseInt(data.games)
       wins += parseInt(data.wins)
@@ -262,19 +266,25 @@ function DrawWins(props) {
       </div>
       <div class="ui divider"></div>
       {props.friends && 
-        Object.entries(props.friends).map((friend, index) =>
-          <>
-          {friend[1].name}
-          <div key={index.toString()} class="ui slow indicating progress" data-percent={Math.floor((friend[1].wins/friend[1].games)*100)} style={{margin: "0 0 1rem 0"}}>
-            <div class="bar">
-              <div class="progress centered"></div>
-            </div>
-          </div>
-          </>
-        )
+        Object.entries(props.friends).map((friend, index) => <DrawUserProgress key={friend[0]} friend={friend} />)
       }
     </div>
   )
+
+  function DrawUserProgress(props) {
+
+    if (props.friend[1].games > 0)
+      return <div >
+        <span>{props.friend[1].name}</span>
+        <div class="ui indicating progress" data-percent={Math.floor((props.friend[1].wins/props.friend[1].games)*100)} style={{margin: "0 0 1rem 0"}}>
+          <div class="bar">
+            <div class="progress centered"></div>
+          </div>
+        </div>
+      </div>
+    else 
+      return null
+  }
 }
 
 class DashboardHeader extends Component {
@@ -322,6 +332,7 @@ class Settings extends Component {
         position: "top attached",
         class: "success"
       })
+      window.localStorage.removeItem("qrCode")
     }
   }
 

@@ -38,6 +38,7 @@ export class Challenge extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
+    if (this.state.isOpen !== nextState.isOpen) return true;
     if (nextState.isOpen) return true;
   }
 
@@ -124,17 +125,21 @@ export class Challenge extends Component {
                   </div>
                   <div class="ui basic section">
                     <div class="ui big selection celled list">
-                    { this.state.friends.map((friend) => 
-                      <div class="item" onClick={this.onSelectUser} uuid={friend[0]} name={friend[1].name}>
-                        <div class="right floated content">
-                          <div class="ui inline loader"></div>
+                    { Object.keys(this.props.friends).length > 0 ?
+                      Object.entries(this.props.friends).map((friend) => 
+                        <div class="item" onClick={this.onSelectUser} uuid={friend[0]} name={friend[1].name}>
+                          <div class="right floated content">
+                            <div class="ui inline loader"></div>
+                          </div>
+                          <em class="ui massive image" data-emoji={emojis[Math.floor(Math.random() * 1000)]} uuid={friend[0]}></em>
+                          <div class="middle aligned content">
+                            <h2 uuid={friend[0]}>{friend[1].name}</h2>
+                          </div>
                         </div>
-                        <em class="ui massive image" data-emoji={emojis[Math.floor(Math.random() * 1000)]} uuid={friend[0]}></em>
-                        <div class="middle aligned content">
-                          <h2 uuid={friend[0]}>{friend[1].name}</h2>
-                        </div>
-                      </div>
-                    )}
+                      )
+                    :
+                      <h2>You have no friends added. Go to Friends List and add them there</h2>
+                    }
                     </div>
                   </div>
                 </div>

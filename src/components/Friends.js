@@ -12,12 +12,12 @@ export class Friends extends Component {
     super(props);
 
     this.state = {
-      svg: null,
       isOpen: false,
       showScanner: false,
     }
 
     this.revealCode = false;
+    this.qrCode = null;
 
     this.onClick = this.onClick.bind(this);
     this.onClickX = this.onClickX.bind(this);
@@ -34,6 +34,7 @@ export class Friends extends Component {
   onClickX() {
     let self = this;
     window.$(findDOMNode(this)).next().transition("fade out", 500, () => {self.setState({isOpen: false});})
+    this.revealCode = false;
   }
 
   showQRCode(event) {
@@ -65,24 +66,22 @@ export class Friends extends Component {
     })
 
     this.setState({showScanner: false})
+
+    this.props.addFriend(uuid, {name: name})
   }
 
   componentDidMount() {
 
-    if (!window.localStorage.getItem("qrCode")) {
+    if (window.localStorage.getItem("qrCode") === null || this.qrCode === null) {
       let code = qrcode({
         content: window.localStorage.getItem("uuid") + window.localStorage.getItem("name"),
         padding: 2,
         width: 256,
         height: 256
       })
-      let svgCode = svg2url(code);
-      this.setState({svg: svgCode});
-      window.localStorage.setItem("qrCode", svgCode);
-    } else {
-      this.setState({svg: window.localStorage.getItem("qrCode")});
-    }
-
+      this.qrCode = svg2url(code);
+      window.localStorage.setItem("qrCode", this.qrCode);
+    } 
   }
 
   onFriendRequest(event) {
@@ -92,17 +91,31 @@ export class Friends extends Component {
     // Only accept friend requests while the qrCode is visible
     if (this.revealCode) {
       // Add friend to local storage db and update the frinds list
-      
+      this.props.addFriend(json.uuid, {name: json.username})
     }
   }
 
   shouldComponentUpdate(nextProps, nextState) {
+    if (this.state.isOpen !== nextState.isOpen) return true;
     if (nextState.isOpen) return true;
   }
 
   componentDidUpdate() {
     // console.log(this.state);
     if (this.state.isOpen) {
+
+      // Regerate code if it changed
+      if (window.localStorage.getItem("qrCode") === null || this.qrCode === null) {
+        let code = qrcode({
+          content: window.localStorage.getItem("uuid") + window.localStorage.getItem("name"),
+          padding: 2,
+          width: 256,
+          height: 256
+        })
+        this.qrCode = svg2url(code);
+        window.localStorage.setItem("qrCode", this.qrCode);
+      } 
+
       // request camera permission
       Html5Qrcode.getCameras().catch((err) => {window.$("body").toast({class: "error", message: err})});
 
@@ -157,7 +170,7 @@ export class Friends extends Component {
                     <div class="qrcode" style={{display: "none"}}>
                       People can scan this code and add you as a friend
                       <div class="ui hidden divider"></div>
-                      <img class="ui rounded centered image" src={this.state.svg} alt="code"></img>
+                      <img class="ui rounded centered image" src={this.qrCode} alt="code"></img>
                       <div class="ui hidden divider"></div>
                       Press scan a friend's code
                     </div>
@@ -170,14 +183,16 @@ export class Friends extends Component {
                   </div>
                   <div class="ui basic section">
                     <div class="ui big celled list">
-                    { this.state.friends.map((friend) => 
-                      <div class="item">
-                        <div class="right floated content">
-                          <div class="ui negative button">Delete</div>
+                    {this.props.friends && Object.keys(this.props.friends).length > 0 && 
+                      Object.entries(this.props.friends).map((friend) => 
+                        <div class="item">
+                          <div class="right floated content">
+                            <div class="ui negative button" onClick={() => this.props.onDeleteFriend(friend[0])}>Delete</div>
+                          </div>
+                          <div class="middle aligned content">{friend[1].name}</div>
                         </div>
-                        <div class="middle aligned content">{friend[1].name}</div>
-                      </div>
-                    )}
+                      )
+                    }
                     </div>
                   </div>
                 </div>
