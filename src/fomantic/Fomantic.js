@@ -38,7 +38,7 @@ export class Field extends Component {
 export class Nag extends Component {
   render() {
     return ( 
-      <div id={this.props.id} class={"ui " + this.props.color + " nag"} style={{display: "none!important"}}><div class="title">{this.props.children}</div></div>
+      <div id={this.props.id} class={"ui " + this.props.color + " nag"} style={{display: "none!important"}}><div class="title">{this.props.children}</div>{this.props.close && <i class="close icon"></i>}</div>
     )
   }
 }
