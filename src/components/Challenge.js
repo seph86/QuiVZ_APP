@@ -23,6 +23,7 @@ export class Challenge extends Component {
     this.onClickX = this.onClickX.bind(this);
     this.onSelectUser = this.onSelectUser.bind(this);
     this.onRecieveReponse = this.onRecieveReponse.bind(this);
+    this.onChallengeExpired = this.onChallengeExpired.bind(this);
 
   }
 
@@ -35,6 +36,7 @@ export class Challenge extends Component {
 
   componentWillUnmount() {
     Listener.src.removeEventListener("response", this.onRecieveReponse);
+    clearTimeout(this.onChallengeExpired);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -49,6 +51,7 @@ export class Challenge extends Component {
         position: "top attached",
         class: "error"
       })
+      clearTimeout(this.onChallengeExpired);
       window.$(".loader").removeClass("active");
       this.setState({waiting: false});
     } else if (event.data === "true") {
@@ -89,6 +92,26 @@ export class Challenge extends Component {
       name: window.$(".item[uuid="+uuid+"]").attr("name")
     });
 
+    // Set timeput for request
+    setTimeout(this.onChallengeExpired, 5000);
+
+  }
+
+  onChallengeExpired() {
+    // Reset state
+    this.setState({
+      waiting: false,
+      uuid: null,
+      name: null
+    });
+    // Remove loading
+    window.$(".item .loader").removeClass("active");
+    // Inform user
+    window.$("body").toast({
+      message: "This user is busy =(",
+      position: "top attached",
+      class: "error"
+    })
   }
 
   render() {
