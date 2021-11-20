@@ -168,11 +168,11 @@ export class Friends extends Component {
                       Reveal scan code
                     </div>
                     <div class="qrcode" style={{display: "none"}}>
-                      People can scan this code and add you as a friend
+                      <h2><span class="ui error text">Alert!</span> People can scan this code and add you as a friend when this qr code is visible</h2>
                       <div class="ui hidden divider"></div>
                       <img class="ui rounded centered image" src={this.qrCode} alt="code"></img>
                       <div class="ui hidden divider"></div>
-                      Press scan a friend's code
+                      Press again to scan a friend's code
                     </div>
                   </div>
                 </div>
