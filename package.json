@@ -5,6 +5,7 @@
   "dependencies": {
     "chart.js": "^3.6.0",
     "chartjs-plugin-datalabels": "^2.0.0",
+    "compress-create-react-app": "^1.2.1",
     "cra-append-sw": "^2.7.0",
     "dompurify": "^2.3.3",
     "emojis-keywords": "^2.0.0",
@@ -18,7 +19,7 @@
   },
   "scripts": {
     "start": "inferno-scripts start",
-    "build": "inferno-scripts build && cat src/custom-service-worker.js >> build/service-worker.js",
+    "build": "inferno-scripts build && cat src/custom-service-worker.js >> build/service-worker.js && compress-cra",
     "serve-old": "http-server -S -C ./cert.pem -K ./key.pem -p 8000 --cors https://192.168.2.2:8080 ./build",
     "serve": "http-server --cors http://localhost:8080 -p 8000 ./build",
     "test": "inferno-scripts test",
