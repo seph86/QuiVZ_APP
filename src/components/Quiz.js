@@ -179,7 +179,7 @@ export class Quiz extends Component {
         window.$(".scorebar > div").removeClass("countingdown");
         self.clickable = false;
       }
-    }, 1000, this)
+    }, 100, this)
 
     // Increment to next question
     this.currentQuestion++;
@@ -297,7 +297,7 @@ export class Quiz extends Component {
     })
 
     const self = this;
-    window.$(".endscreen").transition("fade out", "500ms", () => {
+    window.$("#quiz-container").transition("fade out", "500ms", () => {
       self.props.callback();
     })
 
