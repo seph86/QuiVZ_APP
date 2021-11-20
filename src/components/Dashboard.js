@@ -10,7 +10,7 @@ import { ListUsers } from './ListUsers';
 import { Listener } from '../common/EventListener';
 import { Friends } from './Friends';
 import { Quiz } from './Quiz';
-import { TestPanel } from './TestPanel';
+//import { TestPanel } from './TestPanel';
 
 export class Dashboard extends Component {
 
@@ -67,18 +67,18 @@ export class Dashboard extends Component {
     })
   }
 
-  startQuiz(uuid, name) {
+  startQuiz(uuid) {
 
     const self = this;
     window.$(findDOMNode(this)).transition({
       animation: "fade out",
       onComplete: () => {
-        self.setState({inGame: true})
+        self.setState({
+          inGame: true,
+          opponent: this.state.friends[uuid],
+          uuid: uuid
+        })
       }
-    })
-    window.$("body").api({
-      on: "now",
-      action: "get quiz"
     })
 
   }
@@ -122,11 +122,11 @@ export class Dashboard extends Component {
                 urlData: {
                   uuid: event.data
                 },
-                onSuccess: () => {
+                onSuccess: (result) => {
                   window.$(findDOMNode(this)).transition({
                     animation: "fade out",
                     onComplete: () => {
-                      self.setState({inGame: true, singlePlayer: false, opponent: this.state.friends[event.data].name})
+                      self.setState({inGame: true, singlePlayer: false, opponent: this.state.friends[event.data], uuid: event.data})
                     }
                   })
                 }
@@ -137,12 +137,11 @@ export class Dashboard extends Component {
             text: "No",
             class: "red",
             click: () => {
-              //console.log("rejected");
               window.$("body").api({
                 action: "reject challenge",
                 on: "now",
                 urlData: {
-                  uuid: this.state.friends[event.data]
+                  uuid: event.data
                 }
               })
             }
@@ -168,7 +167,8 @@ export class Dashboard extends Component {
       interval  : 100
     });
 
-    //window.$("#username-nag").nag({key: "username"});
+    // Inform user they can change their name
+    window.$("#username-nag").nag({key: "username"});
 
     // Make progress bars look nice
     window.$(".ui.progress").progress({className: {active: "none", success: "none"}})
@@ -203,6 +203,10 @@ export class Dashboard extends Component {
             <Nag id="username-nag" close>You can change your name in settings (<i class="cog icon"></i>)</Nag>
             <Challenge callback={this.startQuiz} friends={this.state.friends}/>
             <Friends addFriend={this.updateFriendData} friends={this.state.friends} onDeleteFriend={this.onDeleteFriend}/>
+            <SoloPlay onclick={() => {
+              this.setState({inGame: true, singlePlayer: true})
+              console.log("click")
+            }}/>
             <DrawWins friends={this.state.friends}/>
             { this.state.isAdmin && <>
               <div class="ui basic segment hidden">
@@ -210,11 +214,12 @@ export class Dashboard extends Component {
               </div>
               <ListUsers />
               <Test />
-              <TestPanel onClick={() => {
+              {/* <TestPanel onClick={() => {
                 //self.setState( prevState => ( {friends: {...prevState.friends, [uuid]: {name: data.name, games: data.games, wins: data.wins}}} ) )
-                let test = this.state.friends["fc5b9aa7adfdad676c929220ca11d34341f7fac5826ba05fb6d51ae5a1776a38"];
-                this.setState(prevState => ({friends: {...prevState.friends,  ["fc5b9aa7adfdad676c929220ca11d34341f7fac5826ba05fb6d51ae5a1776a38"]: { name:  test.name, games: ++test.games, wins: test.wins + (Math.random() > 0.5 ? 1 : 0)}}}));
-              }}/>
+                // let test = this.state.friends["fc5b9aa7adfdad676c929220ca11d34341f7fac5826ba05fb6d51ae5a1776a38"];
+                // this.setState(prevState => ({friends: {...prevState.friends,  ["fc5b9aa7adfdad676c929220ca11d34341f7fac5826ba05fb6d51ae5a1776a38"]: { name:  test.name, games: ++test.games, wins: test.wins + (Math.random() > 0.5 ? 1 : 0)}}}));
+                this.setState({inGame: true, singlePlayer: true});
+              }}/> */}
             </> }
           </div>
         </div>
@@ -224,6 +229,7 @@ export class Dashboard extends Component {
           opponent={this.state.opponent}
           uuid={this.state.uuid}
           callback={this.onBackFromQuiz}
+          updateFriendData={this.updateFriendData}
           />
       }
       </>
@@ -236,6 +242,7 @@ function DrawWins(props) {
 
   let games = 0, wins = 0
 
+  // eslint-disable-next-line
   for (const [uuid, data] of Object.entries(props.friends) ) {
     if (data.games !== undefined) {
       games += parseInt(data.games)
@@ -248,10 +255,14 @@ function DrawWins(props) {
   return(
     <div id="stats" class="ui segment inverted grey hidden">
       <h2>Stats</h2>
+      <h4 class="ui center aligned header">Wins</h4>
       <div class={ games > 0 && "ui small centered image"} >
         {games > 0 ?
           <>  
             <svg viewBox="0 0 36 36">
+              <path
+                d="m 18,2.0845 a -15.9155,15.9155 0 0 0 0,31.831 -15.9155,15.9155 0 0 0 0,-31.831"
+              />
               <path
                 className="ring-circle"
                 d="m 18,2.0845 a -15.9155,15.9155 0 0 0 0,31.831 -15.9155,15.9155 0 0 0 0,-31.831"
@@ -285,6 +296,22 @@ function DrawWins(props) {
     else 
       return null
   }
+}
+
+function SoloPlay(props) {
+  return(
+    <div class="ui segment inverted blue" onClick={props.onclick}>
+      <div class="ui grid">
+        <div class="ten wide column">
+          <h2>Solo Play</h2>
+          <p>Challenge yourself!</p>
+        </div>
+        <div class="six wide column">
+          <i class="massive user icon"></i>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 class DashboardHeader extends Component {

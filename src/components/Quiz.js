@@ -25,6 +25,7 @@ export class Quiz extends Component {
     this.onOpponentAnswered = this.onOpponentAnswered.bind(this);
     this.onTrigger = this.onTrigger.bind(this);
     this.endGame = this.endGame.bind(this);
+    this.onDisconnect = this.onDisconnect.bind(this);
 
     // non state variables
     this.points = 1000;
@@ -89,7 +90,7 @@ export class Quiz extends Component {
         correct_answer: "right"
       }
     ];
-    this.currentQuestion = 8;
+    this.currentQuestion = 0;
     this.clickable = true;
     this.playeranswered = false;
     this.opponeanswered = false;
@@ -112,7 +113,14 @@ export class Quiz extends Component {
     answers.splice(index, 0, purify.sanitize(loaded_question.correct_answer));
     this.setState({answers: answers, correct: index, question: purify.sanitize(loaded_question.question)});
 
-    window.$(".ui .button").removeClass("red green");
+    window.$(".scorebar > .progress").progress({
+      label: 'ratio',
+      text: {
+        ratio: '{value}'
+      }
+    });
+
+    window.$(".answers .ui.button").removeClass("red green");
     this.clickable = true;
     this.playeranswered = false;
     this.points = 1000;
@@ -129,7 +137,7 @@ export class Quiz extends Component {
         // Disable clicking
         self.clickable = false;
 
-        if (!self.playeranswered) {
+        if (!self.playeranswered && !self.state.singlePlayer) {
           self.addScore(0,false);
           window.$("body").api({
             on: "now",
@@ -141,9 +149,7 @@ export class Quiz extends Component {
           });
         }
 
-        if (self.currentQuestion < 9) {
-
-          window.$(".ui .button").removeClass("red green");
+        if (self.currentQuestion <= 9) {
 
           // Load next question if singleplayer
           if (self.state.singlePlayer)
@@ -158,10 +164,10 @@ export class Quiz extends Component {
               window.$(".endscreen").transition("fade in");
             })
           }, 2000)
-          this.endGame()
         }
 
         clearInterval(self.timer);
+        Listener.src.removeEventListener("opponentDisconnected", this.onDisconnect);
 
       }
 
@@ -173,32 +179,11 @@ export class Quiz extends Component {
         window.$(".scorebar > div").removeClass("countingdown");
         self.clickable = false;
       }
-    }, 100, this)
+    }, 1000, this)
 
     // Increment to next question
     this.currentQuestion++;
 
-
-    // Testing opponent
-    // let time = Math.random() * 8000;
-    // console.log(time);
-    // setTimeout((self) => {
-    //   window.$("#opponent-score > div").removeClass("countingdown")
-    //   let choice = Math.floor(Math.random() * (4 - 0) + 0);
-
-    //   let s = self.state.opponescore;
-
-    //   if (choice === self.state.correct) {
-    //     s += window.$("#opponent-score .ui.progress").progress("get value") 
-    //   }
-
-    //   const c = window.matchChart;
-    //   c.data.datasets[1].data.push(s);
-    //   c.update()
-
-    //   self.setState({opponescore: s})
-
-    // }, time, this)
   }
 
   onAnswer(event) {
@@ -234,6 +219,9 @@ export class Quiz extends Component {
         urlData: {
           points: window.$("#player-score .ui.progress").progress("get value"),
           correct: correct
+        },
+        onSuccess: () => {
+          setTimeout(() => {window.$("body").api({ on: "now", action: "ready"})}, 1500);
         }
       });
     }
@@ -251,22 +239,15 @@ export class Quiz extends Component {
   // Update stats
   endGame() {
 
-    // Does games exist?
-    if (window.localStorage.getItem("games"))
-      window.localStorage.setItem("games", parseInt(window.localStorage.getItem("games")) + 1)
-    else 
-      window.localStorage.setItem("games", 1);
-
-    // Does wins exist?
-    if (window.localStorage.getItem("wins")) {
-      if (this.state.scores[0] > this.state.scores[1])
-        window.localStorage.setItem("wins", parseInt(window.localStorage.getItem("wins")) + 1)
-    } else { 
-      window.localStorage.setItem("wins", 1);
-    }
-
-    let uuid = this.props.uuid;
-    window.quivzStats.setItem("friends", {[uuid]:{games: 20, wins:11} })
+    if (!this.state.singlePlayer)
+      this.props.updateFriendData(
+        this.props.uuid, 
+        {
+          name: this.props.opponent.name,
+          games: this.props.opponent.games + 1,
+          wins: this.props.opponent.wins + (this.state.scores[0] > this.state.scores[1])
+        }
+      )
 
     const self = this;
     window.$(".endscreen").transition("fade out", "500ms", () => {
@@ -304,6 +285,24 @@ export class Quiz extends Component {
 
   }
 
+  onDisconnect() {
+
+    // Halt game
+    clearTimeout(this.timer); 
+
+    window.$("body").toast({
+      message: "Opponent Disconnected, returning to main menu",
+      position: "top attached",
+      class: "error"
+    })
+
+    const self = this;
+    window.$(".endscreen").transition("fade out", "500ms", () => {
+      self.props.callback();
+    })
+
+  }
+
   // This function takes the value from the progress bar and adds the score to the score graph
   addScore(player, increase) {
     
@@ -327,13 +326,6 @@ export class Quiz extends Component {
 
   componentDidMount() {
 
-    // Init progress bars
-    window.$(".scorebar > .progress").progress({
-      text: {
-        percent: '{value}'
-      }
-    })
-
     window.$("#quiz-logo").transition("spin-logo", "500ms", () => { 
       window.$("h1:first-child").transition("slide-title", "3000ms");
       window.$("h1:nth-child(2)").transition("slide-title-reverse", "3000ms")
@@ -343,36 +335,61 @@ export class Quiz extends Component {
     Listener.src.addEventListener("opponentRight", this.onOpponentAnswered);
     Listener.src.addEventListener("opponentWrong", this.onOpponentAnswered);
     Listener.src.addEventListener("trigger", this.onTrigger);
+    Listener.src.addEventListener("opponentDisconnected", this.onDisconnect);
 
-    // Signal server we're ready
-    window.$("body").api({
-      on: "now",
-      action: "ready"
-    })
+    const self = this;
+    if (this.state.singlePlayer)
+      window.$("body").api({
+        on: "now",
+        action: "solo play",
+        onSuccess: (result) => {
+          self.questions = result.data;
+          self.onTrigger();
+        }
+      })
+    else
+      window.$("body").api({
+        on: "now",
+        action: "get quiz",
+        onSuccess: (result) => {
+
+          let data = JSON.parse(result.data);
+          // Load quiestions
+          self.questions = data.results;
+
+          // Signal server we're ready
+          window.$("body").api({
+            on: "now",
+            action: "ready"
+          })
+        }
+      })
 
     const chartContext = window.document.querySelector("#graph").getContext("2d");
 
     let datasets = [
       {
-        backgroundColor: "#4fc1e8",
+        backgroundColor: "#4fc1e880",
         fill: true,
         radius: 0,
         data: [0],
         borderColor: "#4fc1e8",
         borderWidth: 2,
-        tension: 0.4
+        tension: 0.4,
+        order: 1,
       }
     ];
     // Add opponent lines
     if (!this.state.singlePlayer) {
       datasets.push({
-        backgroundColor: "#cd74a8",
+        backgroundColor: "#cd74a880",
         fill: true,
         radius: 0,
         data: [0],
         borderColor: "#cd74a8",
         borderWidth: 2,
-        tension: 0.4
+        tension: 0.4,
+        order: 0,
       });
     }
 
@@ -449,6 +466,7 @@ export class Quiz extends Component {
     Listener.src.removeEventListener("opponentRight", this.onOpponentAnswered);
     Listener.src.removeEventListener("opponentWrong", this.onOpponentAnswered);
     Listener.src.removeEventListener("trigger", this.onTrigger);
+    Listener.src.removeEventListener("opponentDisconnected", this.onDisconnect);
   }
 
   render() {
@@ -460,7 +478,7 @@ export class Quiz extends Component {
             :
             <>
               <h1 style={{position: "absolute", left: "-50vw", "white-space": "nowrap", top: "30%"}}>You</h1>
-              <h1 style={{position: "absolute", left: "-50vw", "white-space": "nowrap", top: "65%"}}>{this.props.opponent}</h1>
+              <h1 style={{position: "absolute", left: "-50vw", "white-space": "nowrap", top: "65%"}}>{this.props.opponent.name}</h1>
             </>
           }
           <img id="quiz-logo" src="/Logo.png" alt="logo" style={{display: "none", width: "40%"}}></img>
@@ -483,7 +501,12 @@ export class Quiz extends Component {
               <div class="ui middle aligned one column centered grid" style={{height: "100%"}}>
                 <div class="row">
                   <div class="column">
-                    <h2 class="ui secondary centered header" dangerouslySetInnerHTML={{__html: this.state.question}}></h2>
+                    {this.state.question.length < 80 && 
+                      <h2 class="ui secondary centered header" dangerouslySetInnerHTML={{__html: this.state.question}}></h2>
+                    }
+                    {this.state.question.length >= 80 && 
+                      <h3 class="ui secondary centered header" dangerouslySetInnerHTML={{__html: this.state.question}}></h3>
+                    }
                   </div>
                 </div>
               </div>
@@ -521,15 +544,17 @@ export class Quiz extends Component {
               <h2>{this.state.scores[0]}</h2>
             </div>
             <div class="row">
-              <h1>
-                {this.state.scores[0] === this.state.scores[1] && "Draw"}
-                {this.state.scores[0] > this.state.scores[1] && "You Won!"}
-                {this.state.scores[0] < this.state.scores[1] && "Oof, not this time =("}
-              </h1>
+              {!this.state.singlePlayer && 
+                <h1>
+                  {this.state.scores[0] === this.state.scores[1] && "Draw - stats not recorded"}
+                  {this.state.scores[0] > this.state.scores[1] && "You Won!"}
+                  {this.state.scores[0] < this.state.scores[1] && "Oof, not this time =("}
+                </h1>
+              }
             </div>
             <div class="row">
               <div>
-                <div class="ui green button" onclick={this.endGame}>Return to menu</div>
+                <div class="ui button green" onclick={this.endGame}>Return to menu</div>
               </div>
             </div>
           </div>

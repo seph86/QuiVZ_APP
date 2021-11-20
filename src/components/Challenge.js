@@ -12,9 +12,7 @@ export class Challenge extends Component {
     this.state = {
       svg: null,
       isOpen: false,
-      waiting: false,
-      uuid: "",
-      name: ""
+      waiting: false
     }
 
     this.revealCode = false;
@@ -23,20 +21,16 @@ export class Challenge extends Component {
     this.onClickX = this.onClickX.bind(this);
     this.onSelectUser = this.onSelectUser.bind(this);
     this.onRecieveReponse = this.onRecieveReponse.bind(this);
-    this.onChallengeExpired = this.onChallengeExpired.bind(this);
 
   }
 
 
   componentDidMount() {
-
     Listener.src.addEventListener("response", this.onRecieveReponse);
-
   }
 
   componentWillUnmount() {
     Listener.src.removeEventListener("response", this.onRecieveReponse);
-    clearTimeout(this.onChallengeExpired);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -51,12 +45,11 @@ export class Challenge extends Component {
         position: "top attached",
         class: "error"
       })
-      clearTimeout(this.onChallengeExpired);
       window.$(".loader").removeClass("active");
       this.setState({waiting: false});
     } else if (event.data === "true") {
       
-      this.props.callback()
+      this.props.callback(this.state.uuid);
 
     }
   }
@@ -92,26 +85,6 @@ export class Challenge extends Component {
       name: window.$(".item[uuid="+uuid+"]").attr("name")
     });
 
-    // Set timeput for request
-    setTimeout(this.onChallengeExpired, 5000);
-
-  }
-
-  onChallengeExpired() {
-    // Reset state
-    this.setState({
-      waiting: false,
-      uuid: null,
-      name: null
-    });
-    // Remove loading
-    window.$(".item .loader").removeClass("active");
-    // Inform user
-    window.$("body").toast({
-      message: "This user is busy =(",
-      position: "top attached",
-      class: "error"
-    })
   }
 
   render() {
@@ -154,9 +127,9 @@ export class Challenge extends Component {
                           <div class="right floated content">
                             <div class="ui inline loader"></div>
                           </div>
-                          <em class="ui massive image" data-emoji={emojis[Math.floor(Math.random() * 1000)]} uuid={friend[0]}></em>
-                          <div class="middle aligned content">
-                            <h2 uuid={friend[0]}>{friend[1].name}</h2>
+                          <em class="ui massive image" data-emoji={emojis[Math.floor(Math.random() * 1000)]} style={{"pointer-events": "none"}}></em>
+                          <div class="middle aligned content" style={{"pointer-events": "none"}}>
+                            <h2>{friend[1].name}</h2>
                           </div>
                         </div>
                       )
