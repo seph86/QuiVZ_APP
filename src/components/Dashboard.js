@@ -316,18 +316,53 @@ function SoloPlay(props) {
 
 class DashboardHeader extends Component {
 
+  componentDidMount() {
+    window.$(".help-modal").modal({allowMultiple: false});
+
+    window.$("#help-modal1").modal('attach events', '#help-modal2 .prev.button');
+
+    window.$("#help-modal2").modal('attach events', '#help-modal1 .next.button');
+    window.$("#help-modal2").modal('attach events', '#help-modal3 .prev.button');
+
+    window.$("#help-modal3").modal('attach events', '#help-modal2 .next.button');
+  }
+
   onClickSettings() {
     window.$("#settings").toggleClass("open");
+  }
+
+  onClickHelp() {
+    window.$("#help-modal1").modal('show');
   }
 
   render() {
     return(
       <div class="ui basic segment horizontally fitted">
+        <div id="help-modal1" class="ui fullscreen basic help-modal modal">
+          Message one
+          <div class="actions">
+            <div class="ui primary button next">next</div>
+          </div>
+        </div>
+        <div id="help-modal2" class="ui fullscreen basic help-modal modal">
+          Message two
+          <div class="actions">
+            <div class="ui secondary button prev">prev</div>
+            <div class="ui primary button next">next</div>
+          </div>
+        </div>
+        <div id="help-modal3" class="ui fullscreen basic help-modal modal">
+          Message three
+          <div class="actions">
+            <div class="ui secondary button prev">prev</div>
+          </div>
+        </div>
         <div class="ui grid compact">
           <div class="ten wide column">
             <h2>Dashboard - Hello, {this.props.username}!</h2>
           </div>
           <div class="right aligned six wide column">
+            <i class="question circle outline big icon" onClick={this.onClickHelp}></i>
             <i class="cog big icon" onClick={this.onClickSettings}></i>
           </div>
         </div>
