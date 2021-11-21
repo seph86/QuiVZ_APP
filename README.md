@@ -69,5 +69,5 @@ By constantly switching environments while testing the app during multiple phase
 ### How much of the prototype UX1 remains in the final project.
 The original code used for UX1 is completely non-existant in this project as it was developed using ReactJS with FomanticUI integrated and using a CDN instead of a compiled product using NodeJS.  However the general visual layout has remained largely the same.
 
-Where has your project Object Oriented programming implemented
+### Where has your project Object Oriented programming implemented
 The app was built InfernoJS using mostly component classes which is a form of OOP.
