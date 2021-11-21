@@ -9,7 +9,7 @@ Clone repo to a directory of your choosing
 git clone https://github.com/seph86/QuiVZ_APP.git
 ```
 
-Install neccessary npm packages
+Install necessary npm packages
 ```
 npm i
 ```
@@ -39,10 +39,10 @@ API may need to be set as seen in [index.js](src/index.js)
 
 ## UX3
 
-- The readme details technical information on deployment of the application so that team members or fresh developers have a easier start to developing the product.
-- An in app help system provides new users a way to learn how to use the app without guesswork.  No matter how "intuative" a product may be, some users may still struggle to understand how to use it.
+- The readme details technical information on deployment of the application so that team members or fresh developers have an easier start to developing the product.
+- An in app help system provides new users a way to learn how to use the app without guesswork.  No matter how "intuitive" a product may be, some users may still struggle to understand how to use it.
 - The roadmap provides a list of future goals for developers to implement as well as show general users of planned features for the app.
-- A existing built product allows users to use the product without the need of setting it up themselves which may be impossible for those who have no experience in setting up applications.
+- An existing built product allows users to use the product without the need of setting it up themselves which may be impossible for those who have no experience in setting up applications.
 
 A general help document or wiki as to the workings and procedures of the apps systems can help in the further development of the product.
 
@@ -53,10 +53,10 @@ A general help document or wiki as to the workings and procedures of the apps sy
 Initial setup of the building blocks for the app, such as frameworks, libraries and technologies such as SSE was easy to implement/develop.
 
 ### What was the most difficult to implement
-Due to the nature of the app, Server Side Events was a requirement.  Finding a solution where multiple sessions could cross communicate took a substantial ammount of time.
+Due to the nature of the app, Server Side Events was a requirement.  Finding a solution where multiple sessions could cross communicate took a substantial amount of time.
 
 ### If you had the chance to do this again, what would you do differently
-Implementation and customisation of Fomantic UI framework; while a nice looking framework, is too clunky, bloated, and almost impossible to optimize.  Causing a required huge CSS file to make the app work reducing the app's responsiveness low.  A more mobile centric UI framework would of been a better choice.
+Implementation and customisation of Fomantic UI framework; while a nice looking framework, is too clunky, bloated, and almost impossible to optimise.  Causing a required huge CSS file to make the app work reducing the app's responsiveness low.  A more mobile centric UI framework would of been a better choice.
 Using SSE might of also been a poor choice for real time event handling.  Websocket's might of been a better choice
 
 ### What parts of the implementation incomplete at this stage of delivery.
