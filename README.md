@@ -71,3 +71,10 @@ The original code used for UX1 is completely non-existant in this project as it 
 
 ### Where has your project Object Oriented programming implemented
 The app was built InfernoJS using mostly component classes which is a form of OOP.
+
+
+## Feedback
+- Suggestion to start the game when both parties "ready" instead of instantly starting the game when the challenged player accepts
+- Show a little more end screen statistics such as number of answered questions.
+- Score data during a game needs to be more clear and maybe placed higher up the screen so it is easier to refer too
+
