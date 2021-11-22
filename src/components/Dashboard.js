@@ -10,6 +10,10 @@ import { ListUsers } from './ListUsers';
 import { Listener } from '../common/EventListener';
 import { Friends } from './Friends';
 import { Quiz } from './Quiz';
+import DashboardHelp from '../images/Main.png';
+import ChallengeHelp from '../images/Challenge.png';
+import FriendsHelp from '../images/Friends.png';
+
 //import { TestPanel } from './TestPanel';
 
 export class Dashboard extends Component {
@@ -314,10 +318,11 @@ function SoloPlay(props) {
   )
 }
 
+
 class DashboardHeader extends Component {
 
   componentDidMount() {
-    window.$(".help-modal").modal({allowMultiple: false});
+    window.$(".help-modal").modal({allowMultiple: false, closeIcon: true});
 
     window.$("#help-modal1").modal('attach events', '#help-modal2 .prev.button');
 
@@ -339,20 +344,32 @@ class DashboardHeader extends Component {
     return(
       <div class="ui basic segment horizontally fitted">
         <div id="help-modal1" class="ui fullscreen basic help-modal modal">
-          Message one
+          <i class="close icon"></i>
+          <div class="content">
+            <img class="ui medium image" src={DashboardHelp} alt="help1"></img>
+            <p>The dashboard is the main menu to navigate.  From here you can challenge your friends, add new friends, or simply try a solo game.  The cog icon will take you to settings where you can change your name, switch to light theme, or update your password.</p>
+          </div>
           <div class="actions">
             <div class="ui primary button next">next</div>
           </div>
         </div>
         <div id="help-modal2" class="ui fullscreen basic help-modal modal">
-          Message two
+          <i class="close icon"></i>
+          <div class="content">
+            <img class="ui medium image" src={ChallengeHelp} alt="help1"></img>
+            <p>From this menu you can challenge your friend to a game.  You must have added a friend from the "Friends" menu to challenge them.  To initiate a challenge, tap on their name.</p>
+          </div>
           <div class="actions">
             <div class="ui secondary button prev">prev</div>
             <div class="ui primary button next">next</div>
           </div>
         </div>
         <div id="help-modal3" class="ui fullscreen basic help-modal modal">
-          Message three
+          <i class="close icon"></i>
+          <div class="content">
+            <img class="ui medium image" src={FriendsHelp} alt="help1"></img>
+            <p>From here you can add friends or allow friends to add you.  To do either the QR code must be visible.  Tap the "Reveal scan code" button to make the code visible.  Tap the QR code button again to enable the camera.  To add a friend have them reveal their code, then scan it with your camera. To delete a friend tap the delete button (This action is not undoable)</p>
+          </div>
           <div class="actions">
             <div class="ui secondary button prev">prev</div>
           </div>
